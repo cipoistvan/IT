@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using MySqlConnector;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,29 @@ namespace ITAssets
         public MainWindow()
         {
             InitializeComponent();
+            
+        }
+
+
+        private void DBConnectionTest()
+        {
+            string connectionString = "server=localhost;database=itassets;user=root;password=;";
+
+            try
+            {
+                using var connection = new MySqlConnection(connectionString);
+                connection.Open();
+                MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            DBConnectionTest();
         }
     }
 }
