@@ -17,10 +17,25 @@ namespace ITAssets
     /// </summary>
     public partial class MainWindow : Window
     {
+
+
         public MainWindow()
         {
             InitializeComponent();
-            
+
+            DataContext = new PurchasesViewModel();
+
+            try
+            {
+                new DatabaseService(App.connectionString).GetConnection();
+                MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+
         }
 
 
@@ -42,7 +57,19 @@ namespace ITAssets
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            DBConnectionTest();
+            
+
+            try
+            {
+                new DatabaseService(App.connectionString).GetConnection();
+                MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+
         }
     }
 }
