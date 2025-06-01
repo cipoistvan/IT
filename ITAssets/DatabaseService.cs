@@ -3,7 +3,6 @@ using System.Data;
 
 namespace ITAssets
 {
-
     public class DatabaseService
     {
         private readonly string connectionString;
@@ -16,7 +15,7 @@ namespace ITAssets
         // Külön metódus a kapcsolat létrehozására
         public MySqlConnection GetConnection()
         {
-            try 
+            try
             {
                 var conn = new MySqlConnection(connectionString);
                 conn.Open();
@@ -33,7 +32,7 @@ namespace ITAssets
         // Általános lekérdező (csak olvasásra)
         public MySqlDataReader ExecuteQuery(MySqlConnection conn, string query)
         {
-             var cmd = new MySqlCommand(query, conn);
+            var cmd = new MySqlCommand(query, conn);
             return cmd.ExecuteReader(CommandBehavior.CloseConnection); // automatikus close
         }
 
@@ -57,9 +56,9 @@ namespace ITAssets
             JOIN categories c ON pr.categoryid = c.id
             ORDER BY p.date DESC";
 
-             using var conn = GetConnection();
+            using var conn = GetConnection();
 
-             using var reader = ExecuteQuery(conn, query);
+            using var reader = ExecuteQuery(conn, query);
 
             while (reader.Read())
             {
@@ -77,14 +76,111 @@ namespace ITAssets
 
             return list;
         }
+
+
+        public List<Part> GetParts()
+        {
+            var list = new List<Part>();
+
+            var query = @"
+            SELECT 
+                p.id AS ID,
+                p.name AS Name,
+                c.name AS Category
+            FROM parts p
+            JOIN categories c ON p.categoryid = c.id
+            ORDER BY p.id";
+
+            using var conn = GetConnection();
+
+            using var reader = ExecuteQuery(conn, query);
+
+            while (reader.Read())
+            {
+                list.Add(new Part
+                {
+                    ID = reader.GetInt32("ID"),
+                    Name = reader.GetString("Name"),
+                    CategoryName = reader.GetString("Category"),
+                });
+            }
+
+            return list;
+        }
+
+        public List<ITAssembly> GetITAssemblies()
+        {
+            var list = new List<ITAssembly>();
+
+            var query = @"
+            SELECT 
+                a.id AS ID,
+                a.name AS Name,
+                a.date AS Date,
+                u.username AS UserName
+            FROM assemblies a
+            JOIN users u ON a.userid = u.id
+            ORDER BY a.id";
+
+            using var conn = GetConnection();
+
+            using var reader = ExecuteQuery(conn, query);
+
+            while (reader.Read())
+            {
+                list.Add(new ITAssembly
+                {
+                    ID = reader.GetInt32("ID"),
+                    Name = reader.GetString("Name"),
+                    Date = reader.GetDateTime("Date"),
+                    UserName = reader.GetString("UserName")
+                });
+            }
+
+            return list;
+        }
+
+        public List<ASPart> GetASParts()
+        {
+            var list = new List<ASPart>();
+
+            var query = @"
+                SELECT 
+                a.id AS ID,
+                p.name AS PartName,
+                ass.Name as ASName,
+                c.name AS Category,
+                a.quantity as Quantity
+       
+                FROM assemblyparts a
+                JOIN assemblies ass ON a.AssemblyId = ass.id
+                JOIN parts p ON a.partid = p.id
+                JOIN categories c ON p.categoryid = c.id
+                ORDER BY p.id";
+
+            using var conn = GetConnection();
+
+            using var reader = ExecuteQuery(conn, query);
+
+            while (reader.Read())
+            {
+                list.Add(new ASPart
+                {
+                    ID = reader.GetInt32("ID"),
+                    PartName = reader.GetString("PartName"),
+                    AssemblyName = reader.GetString("ASName"),
+                    CategoryName = reader.GetString("Category"),
+                    Quantity = reader.GetInt32("Quantity"),
+
+                });
+            }
+
+            return list;
+        }
+
+
+
+
     }
 }
 
-//public int ID { get; set; }
-//public DateTime Date { get; set; }
-//public string User { get; set; }
-//public string ItemName { get; set; }
-//public string Type { get; set; }
-//public int Quantity { get; set; }
-//public decimal UnitPrice { get; set; }
-//public decimal Total => Quantity * UnitPrice;

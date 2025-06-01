@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ITAssets
 {
-    public class DesignPurchaseProvider
+    public class DesignPurchasesViewModel
     {
         public List<Purchase> Purchases { get; set; }
 
-        public DesignPurchaseProvider()
+        public DesignPurchasesViewModel()
         {
             Purchases = new List<Purchase>
             {
@@ -29,7 +29,7 @@ namespace ITAssets
 
         public PurchasesViewModel()
         {
-            // Purchases = new DesignPurchaseProvider().Purchases;
+            //Purchases = new DesignPurchasesViewModel().Purchases;
             Purchases = new DatabaseService(App.connectionString).GetPurchases();
         }
     }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ITAssets"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance local:DesignPurchaseProvider,  IsDesignTimeCreatable=True}"
+        d:DataContext="{d:DesignInstance local:DesignMainViewModel,  IsDesignTimeCreatable=True}"
         Title="MainWindow" Background="Transparent" SizeToContent="WidthAndHeight" MinHeight="500" MinWidth="800">
     <Window.Resources>
         <Style x:Key="RightAlignedText" TargetType="TextBlock">
@@ -13,8 +13,8 @@
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
     </Window.Resources>
-    
-    
+
+
     <Border CornerRadius="10" Background="White" BorderThickness="5,5,5,5" BorderBrush="Black">
         <Grid Margin="20">
             <Button Content="Belépés" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="Button_Click" RenderTransformOrigin="3.681,1.351"/>
@@ -25,7 +25,7 @@
                 <TabItem Header="Beszerzés" IsSelected="True">
                     <Grid Background="#FFE5E5E5">
 
-                        <DataGrid ItemsSource="{Binding Purchases}" AutoGenerateColumns="False" Margin="0,0,0,101" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False">
+                        <DataGrid ItemsSource="{Binding PurchaseVM.Purchases}" AutoGenerateColumns="False" Margin="0,0,0,101" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
                                 <DataGridTextColumn Header="Dátum" Binding="{Binding Date}"/>
@@ -54,13 +54,103 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Alkatrészek">
-                    <Grid Background="#FFE5E5E5"/>
+                    <Grid Background="#FFE5E5E5">
+
+                        <DataGrid ItemsSource="{Binding PartVM.Parts}" AutoGenerateColumns="False" Margin="0,0,0,101" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
+                                <DataGridTextColumn Header="Megnevezés" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="Kategória" Binding="{Binding CategoryName}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom"/>
+                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="63,0,0,64" VerticalAlignment="Bottom"/>
+                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="136,0,0,64" VerticalAlignment="Bottom" RenderTransformOrigin="-7.486,1.257"/>
+                        <DatePicker HorizontalAlignment="Left" Margin="282,0,0,34" VerticalAlignment="Bottom"/>
+                        <ComboBox HorizontalAlignment="Left" Margin="282,0,0,63" VerticalAlignment="Bottom" Width="241"/>
+                        <Label Content="Dátum:" HorizontalAlignment="Left" Margin="229,0,0,34" VerticalAlignment="Bottom" RenderTransformOrigin="0.579,-0.613"/>
+                        <Label Content="Alkatrész:" HorizontalAlignment="Left" Margin="217,0,0,63" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,62" TextWrapping="Wrap" Text="1" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Mennyiség:" HorizontalAlignment="Left" Margin="545,0,0,64" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,33" TextWrapping="Wrap" Text="2" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Egységár:" HorizontalAlignment="Left" Margin="555,0,0,37" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,4" TextWrapping="Wrap" Text="3" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Összesen:" HorizontalAlignment="Left" Margin="554,0,0,9" VerticalAlignment="Bottom"/>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Összeszerelés">
-                    <Grid Background="#FFE5E5E5"/>
+                    <Grid Background="#FFE5E5E5">
+
+                        <DataGrid ItemsSource="{Binding ITAssemblyVM.ITAssemblies}" AutoGenerateColumns="False" Margin="10,33,0,129" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HorizontalAlignment="Left" Width="230">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
+                                <DataGridTextColumn Header="Megnevezés" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="Dátum" Binding="{Binding Date, StringFormat={}{0:yyyy.MM.dd}}"/>
+                                <DataGridTextColumn Header="Felhasználó" Binding="{Binding UserName}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid ItemsSource="{Binding ASPartVM.ASParts}" AutoGenerateColumns="False" Margin="0,33,0,129" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HorizontalAlignment="Center" Width="230">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
+                                <DataGridTextColumn Header="Eszköz" Binding="{Binding AssemblyName}"/>
+                                <DataGridTextColumn Header="Megnevezés" Binding="{Binding PartName}"/>
+                                <DataGridTextColumn Header="Kategória" Binding="{Binding CategoryName}"/>
+                                <DataGridTextColumn Header="Mennyiség" Binding="{Binding Quantity}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid ItemsSource="{Binding PartVM.Parts}" AutoGenerateColumns="False" Margin="0,33,10,129" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HorizontalAlignment="Right" Width="230">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
+                                <DataGridTextColumn Header="Megnevezés" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="Kategória" Binding="{Binding CategoryName}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+
+
+                        <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom"/>
+                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="63,0,0,64" VerticalAlignment="Bottom"/>
+                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="136,0,0,64" VerticalAlignment="Bottom" RenderTransformOrigin="-7.486,1.257"/>
+                        <DatePicker HorizontalAlignment="Left" Margin="282,0,0,34" VerticalAlignment="Bottom"/>
+                        <ComboBox HorizontalAlignment="Left" Margin="282,0,0,63" VerticalAlignment="Bottom" Width="241"/>
+                        <Label Content="Dátum:" HorizontalAlignment="Left" Margin="229,0,0,34" VerticalAlignment="Bottom" RenderTransformOrigin="0.579,-0.613"/>
+                        <Label Content="Alkatrész:" HorizontalAlignment="Left" Margin="217,0,0,63" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,62" TextWrapping="Wrap" Text="1" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Mennyiség:" HorizontalAlignment="Left" Margin="545,0,0,64" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,33" TextWrapping="Wrap" Text="2" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Egységár:" HorizontalAlignment="Left" Margin="555,0,0,37" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,4" TextWrapping="Wrap" Text="3" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Összesen:" HorizontalAlignment="Left" Margin="554,0,0,9" VerticalAlignment="Bottom"/>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Felhasználók">
-                    <Grid Background="#FFE5E5E5"/>
+                    <Grid Background="#FFE5E5E5">
+
+                        <DataGrid ItemsSource="{Binding Purchases}" AutoGenerateColumns="False" Margin="0,0,0,101" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
+                                <DataGridTextColumn Header="Dátum" Binding="{Binding Date}"/>
+                                <DataGridTextColumn Header="Felhasználó" Binding="{Binding User}"/>
+                                <DataGridTextColumn Header="Terméknév" Binding="{Binding ItemName}"/>
+                                <DataGridTextColumn Header="Mennyiség" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightAlignedText}"/>
+                                <DataGridTextColumn Header="Egységár" Binding="{Binding UnitPrice}" ElementStyle="{StaticResource RightAlignedText}"/>
+                                <DataGridTextColumn Header="Összesen" Binding="{Binding Total}" ElementStyle="{StaticResource RightAlignedText}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom"/>
+                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="63,0,0,64" VerticalAlignment="Bottom"/>
+                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="136,0,0,64" VerticalAlignment="Bottom" RenderTransformOrigin="-7.486,1.257"/>
+                        <DatePicker HorizontalAlignment="Left" Margin="282,0,0,34" VerticalAlignment="Bottom"/>
+                        <ComboBox HorizontalAlignment="Left" Margin="282,0,0,63" VerticalAlignment="Bottom" Width="241"/>
+                        <Label Content="Dátum:" HorizontalAlignment="Left" Margin="229,0,0,34" VerticalAlignment="Bottom" RenderTransformOrigin="0.579,-0.613"/>
+                        <Label Content="Alkatrész:" HorizontalAlignment="Left" Margin="217,0,0,63" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,62" TextWrapping="Wrap" Text="1" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Mennyiség:" HorizontalAlignment="Left" Margin="545,0,0,64" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,33" TextWrapping="Wrap" Text="2" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Egységár:" HorizontalAlignment="Left" Margin="555,0,0,37" VerticalAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,4" TextWrapping="Wrap" Text="3" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Összesen:" HorizontalAlignment="Left" Margin="554,0,0,9" VerticalAlignment="Bottom"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
         </Grid>

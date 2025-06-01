@@ -23,7 +23,7 @@ namespace ITAssets
         {
             InitializeComponent();
 
-            DataContext = new PurchasesViewModel();
+            DataContext = new MainViewModel();
 
             try
             {
