@@ -178,6 +178,38 @@ namespace ITAssets
             return list;
         }
 
+        public List<User> GetUsers()
+        {
+            var list = new List<User>();
+
+            var query = @"
+                SELECT 
+                u.id AS ID,
+                u.username AS UserName,
+                u.passwordhash as Password,
+                u.email AS Email
+       
+                FROM users u
+                ORDER BY u.id";
+
+            using var conn = GetConnection();
+
+            using var reader = ExecuteQuery(conn, query);
+
+            while (reader.Read())
+            {
+                list.Add(new User
+                {
+                    ID = reader.GetInt32("ID"),
+                    UserName = reader.GetString("UserName"),
+                    Password = reader.GetString("Password"),
+                    Email= reader.GetString("Email")
+
+                });
+            }
+
+            return list;
+        }
 
 
 

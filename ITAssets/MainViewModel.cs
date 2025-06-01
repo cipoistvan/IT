@@ -12,14 +12,14 @@ namespace ITAssets
         public PartsViewModel PartVM { get; set; }
         public ITAssemblyViewModel ITAssemblyVM { get; set; }
         public ASPartsViewModel ASPartVM { get; set; }
+        public UsersViewModel UserVM { get; set; }
         public MainViewModel()
         {
             PurchaseVM = new PurchasesViewModel();
             PartVM = new PartsViewModel();
             ITAssemblyVM = new ITAssemblyViewModel();
             ASPartVM = new ASPartsViewModel();
+            UserVM = new UsersViewModel();
         }
-
-
     }
 }
