@@ -24,8 +24,12 @@
             <TabControl Margin="0,48,0,0">
                 <TabItem Header="Beszerzés" IsSelected="True">
                     <Grid Background="#FFE5E5E5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="263*"/>
+                            <ColumnDefinition Width="481*"/>
+                        </Grid.ColumnDefinitions>
 
-                        <DataGrid ItemsSource="{Binding PurchaseVM.Purchases}" AutoGenerateColumns="False" Margin="0,0,0,101" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False">
+                        <DataGrid ItemsSource="{Binding PurchaseVM.Purchases}" AutoGenerateColumns="False" Margin="0,0,0,101" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" Grid.ColumnSpan="2">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
                                 <DataGridTextColumn Header="Dátum" Binding="{Binding Date}"/>
@@ -39,16 +43,16 @@
                         <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom"/>
                         <Button Content="Módosítás" HorizontalAlignment="Left" Margin="63,0,0,64" VerticalAlignment="Bottom"/>
                         <Button Content="Törlés" HorizontalAlignment="Left" Margin="136,0,0,64" VerticalAlignment="Bottom" RenderTransformOrigin="-7.486,1.257"/>
-                        <DatePicker HorizontalAlignment="Left" Margin="282,0,0,34" VerticalAlignment="Bottom"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="282,0,0,63" VerticalAlignment="Bottom" Width="241"/>
-                        <Label Content="Dátum:" HorizontalAlignment="Left" Margin="229,0,0,34" VerticalAlignment="Bottom" RenderTransformOrigin="0.579,-0.613"/>
-                        <Label Content="Alkatrész:" HorizontalAlignment="Left" Margin="217,0,0,63" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,62" TextWrapping="Wrap" Text="1" VerticalAlignment="Bottom" Width="120" Height="24"/>
-                        <Label Content="Mennyiség:" HorizontalAlignment="Left" Margin="545,0,0,64" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,33" TextWrapping="Wrap" Text="2" VerticalAlignment="Bottom" Width="120" Height="24"/>
-                        <Label Content="Egységár:" HorizontalAlignment="Left" Margin="555,0,0,37" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="620,0,0,4" TextWrapping="Wrap" Text="3" VerticalAlignment="Bottom" Width="120" Height="24"/>
-                        <Label Content="Összesen:" HorizontalAlignment="Left" Margin="554,0,0,9" VerticalAlignment="Bottom"/>
+                        <DatePicker HorizontalAlignment="Left" Margin="19,0,0,34" VerticalAlignment="Bottom" Grid.Column="1"/>
+                        <ComboBox HorizontalAlignment="Left" Margin="19,0,0,63" VerticalAlignment="Bottom" Width="241" Grid.Column="1"/>
+                        <Label Content="Dátum:" HorizontalAlignment="Left" Margin="229,0,0,34" VerticalAlignment="Bottom" RenderTransformOrigin="0.579,-0.613" Grid.ColumnSpan="2"/>
+                        <Label Content="Alkatrész:" HorizontalAlignment="Left" Margin="217,0,0,63" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+                        <TextBox HorizontalAlignment="Left" Margin="357,0,0,62" TextWrapping="Wrap" Text="1" VerticalAlignment="Bottom" Width="120" Height="24" Grid.Column="1"/>
+                        <Label Content="Mennyiség:" HorizontalAlignment="Left" Margin="282,0,0,64" VerticalAlignment="Bottom" Grid.Column="1"/>
+                        <TextBox HorizontalAlignment="Left" Margin="357,0,0,33" TextWrapping="Wrap" Text="2" VerticalAlignment="Bottom" Width="120" Height="24" Grid.Column="1"/>
+                        <Label Content="Egységár:" HorizontalAlignment="Left" Margin="292,0,0,37" VerticalAlignment="Bottom" Grid.Column="1"/>
+                        <TextBox HorizontalAlignment="Left" Margin="357,0,0,4" TextWrapping="Wrap" Text="3" VerticalAlignment="Bottom" Width="120" Height="24" Grid.Column="1"/>
+                        <Label Content="Összesen:" HorizontalAlignment="Left" Margin="291,0,0,9" VerticalAlignment="Bottom" Grid.Column="1"/>
 
 
                     </Grid>
@@ -135,12 +139,12 @@
                             </DataGrid.Columns>
                         </DataGrid>
                         <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom"/>
-                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="63,0,0,64" VerticalAlignment="Bottom"/>
+                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="63,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.ToggleReadOnlyCmd}"/>
                         <Button Content="Törlés" HorizontalAlignment="Left" Margin="136,0,0,64" VerticalAlignment="Bottom"/>
-                        
+
                         <Label Content="Felhasználó:" HorizontalAlignment="Left" Margin="399,0,0,64" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="478,0,0,62" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.UserName}" VerticalAlignment="Bottom" Width="120" Height="24"/>
-                        
+                        <TextBox HorizontalAlignment="Left" Margin="478,0,0,62" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.UserName}" IsEnabled="{Binding UserVM.IsReadOnly1}" VerticalAlignment="Bottom" Width="120" Height="24"/>
+
                         <Label Content="Jelszó:" HorizontalAlignment="Left" Margin="429,0,0,33" VerticalAlignment="Bottom"/>
                         <TextBox HorizontalAlignment="Left" Margin="478,0,0,33" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.Password}" VerticalAlignment="Bottom" Width="120" Height="24"/>
 

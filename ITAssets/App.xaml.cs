@@ -1,6 +1,8 @@
-﻿using System.Configuration;
+﻿using ITAssets;
+using System.Configuration;
 using System.Data;
 using System.Windows;
+using MySqlConnector;
 
 namespace ITAssets
 {
@@ -11,8 +13,25 @@ namespace ITAssets
     {
         public static string connectionString = "server=localhost;database=itassets;user=root;password=;";
 
-        // public static DatabaseService datasvc = new DatabaseService(connectionString);
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            try
+            {
+                new DatabaseService(App.connectionString).GetConnection();
+                //MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+                return;
+            }
+
+            var mainWindow = new MainWindow();
+            mainWindow.Show();
+        }
 
 
     }

@@ -17,59 +17,14 @@ namespace ITAssets
     /// </summary>
     public partial class MainWindow : Window
     {
-
-
         public MainWindow()
         {
             InitializeComponent();
-
             DataContext = new MainViewModel();
-
-            try
-            {
-                new DatabaseService(App.connectionString).GetConnection();
-                MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-
-        }
-
-
-        private void DBConnectionTest()
-        {
-            string connectionString = "server=localhost;database=itassets;user=root;password=;";
-
-            try
-            {
-                using var connection = new MySqlConnection(connectionString);
-                connection.Open();
-                MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            
-
-            try
-            {
-                new DatabaseService(App.connectionString).GetConnection();
-                MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-
         }
     }
 }

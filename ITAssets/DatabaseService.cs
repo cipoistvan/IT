@@ -1,4 +1,5 @@
 ﻿using MySqlConnector;
+using System.Collections.ObjectModel;
 using System.Data;
 
 namespace ITAssets
@@ -22,7 +23,7 @@ namespace ITAssets
                 return conn;
             }
 
-            catch (MySqlException)
+            catch (MySqlException ex)
             {
                 throw;
             }
@@ -178,9 +179,9 @@ namespace ITAssets
             return list;
         }
 
-        public List<User> GetUsers()
+        public ObservableCollection<User> GetUsers()
         {
-            var list = new List<User>();
+            var list = new ObservableCollection<User>();
 
             var query = @"
                 SELECT 
