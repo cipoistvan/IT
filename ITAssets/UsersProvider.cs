@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace ITAssets
@@ -40,18 +42,59 @@ namespace ITAssets
     {
         public ObservableCollection<User> Users { get; }
         
-        public ICommand ToggleReadOnlyCmd { get; }
+        public ICommand AddUserCmd { get; }
+        public ICommand ModifyUserCmd { get; }
+        public ICommand DeleteUserCmd { get; }
+        public ICommand SaveUserCmd { get; }
+
 
         public UsersViewModel()
         {
             Users = new DatabaseService(App.connectionString).GetUsers();
-            ToggleReadOnlyCmd = new RelayCommand
+
+
+            AddUserCmd = new RelayCommand
                 (
-                    execute: _ => IsReadOnly1 = false,
-                    canExecute: _ => SelectedUser != null
+                    execute: _ => { },
+                    canExecute: _ => !IsEnabled
                 );
 
+            ModifyUserCmd = new RelayCommand
+                (
+                    execute: _ => IsEnabled = true,
+                    canExecute: _ => SelectedUser != null && !IsEnabled
+                );
+
+            DeleteUserCmd = new RelayCommand
+                (
+                    execute: _ => { },
+                    canExecute: _ => SelectedUser != null && !IsEnabled
+                );
+
+            SaveUserCmd = new RelayCommand(ExecuteSave, CanExecuteSave);
+                //(
+                //    execute: _ => IsEnabled = false,
+                //    canExecute: _ => IsEnabled == true
+                //);
+
         }
+
+        private void ExecuteSave (object parameter)
+        {
+
+            if (parameter is object[] values && values.Length == 2)
+            {
+                string val1 = values[0] as string ?? "";
+                string val2 = values[1] as string ?? "";
+                MessageBox.Show($"Beérkező: {val1} és {val2}");
+            }
+
+            IsEnabled = false;
+
+        }
+
+        private bool CanExecuteSave(object parameter) => IsEnabled;
+
         private User _selectedUser;
 
         public User SelectedUser
@@ -62,9 +105,6 @@ namespace ITAssets
                 if (_selectedUser != value)
                 {
                     _selectedUser = value;
-                    //OnPropertyChanged(); // INotifyPropertyChanged
-
-                    //OnUserSelected(_selectedUser);
 
                     if (value is null)
                         EditUser = null;
@@ -83,17 +123,8 @@ namespace ITAssets
                 }
             }
         }
-        public void OnUserSelected(User selected)
-        {
-            if (selected != null)
-            {
-                MessageBox.Show(selected.UserName);
-            }
-        }
 
         private User _editUser;
-
-        
 
         public User EditUser
         {
@@ -109,24 +140,25 @@ namespace ITAssets
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged(string propertyName) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 
-        private bool _IsReadOnly1 = true;
-        public bool IsReadOnly1
+        private bool _IsEnabled = false;
+        public bool IsEnabled
         {
-            get => _IsReadOnly1;
+            get => _IsEnabled;
             set
             {
-                if (_IsReadOnly1 != value)
+                if (_IsEnabled != value)
                 {
-                    _IsReadOnly1 = value;
-                    OnPropertyChanged(nameof(IsReadOnly1));
+                    _IsEnabled = value;
+                    OnPropertyChanged(nameof(IsEnabled));
+                    OnPropertyChanged(nameof(IsGridEnabled));
                 }
             }
         }
 
+        public bool IsGridEnabled => !IsEnabled;
 
         public class RelayCommand : ICommand
         {
@@ -159,9 +191,20 @@ namespace ITAssets
                 CommandManager.InvalidateRequerySuggested();
             }
         }
-
-
-
     }
+
+    public class MultiParamConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            return values.Clone();
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 
 }
