@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -44,56 +46,108 @@ namespace ITAssets
         
         public ICommand AddUserCmd { get; }
         public ICommand ModifyUserCmd { get; }
+        public ICommand CancelUserCmd { get; }
         public ICommand DeleteUserCmd { get; }
         public ICommand SaveUserCmd { get; }
 
 
         public UsersViewModel()
         {
-            Users = new DatabaseService(App.connectionString).GetUsers();
+
+            var DBConnection = new DatabaseService(App.connectionString);
+            Users = DBConnection.GetUsers();
 
 
             AddUserCmd = new RelayCommand
                 (
                     execute: _ => { },
-                    canExecute: _ => !IsEnabled
+                    canExecute: _ => !IsEditMode
                 );
 
             ModifyUserCmd = new RelayCommand
                 (
-                    execute: _ => IsEnabled = true,
-                    canExecute: _ => SelectedUser != null && !IsEnabled
+                    execute: _ => IsEditMode = true,
+                    canExecute: _ => SelectedUser != null && !IsEditMode
                 );
 
             DeleteUserCmd = new RelayCommand
                 (
-                    execute: _ => { },
-                    canExecute: _ => SelectedUser != null && !IsEnabled
+                    execute: _ => {
+                        var result = DBConnection.DeleteUser(SelectedUser);
+
+                        switch (result)
+                        {
+                            case DeleteResult.Success:
+                                SelectedUser = null;
+                                Users.Clear();
+                                foreach (var user in DBConnection.GetUsers())
+                                {
+                                    Users.Add(user);
+                                }
+                                break;
+
+                            case DeleteResult.ForeignKeyConstraint:
+                                MessageBox.Show("Nem törölhető a felhasználó, mert más rekord hivatkozik rá.");
+                                break;
+
+                            case DeleteResult.Error:
+                                MessageBox.Show("Ismeretlen adatbázis hiba történt.");
+                                break;
+
+                        }
+                   
+                    },
+                    canExecute: _ => SelectedUser != null && !IsEditMode
+
                 );
 
             SaveUserCmd = new RelayCommand(ExecuteSave, CanExecuteSave);
-                //(
-                //    execute: _ => IsEnabled = false,
-                //    canExecute: _ => IsEnabled == true
-                //);
 
+            CancelUserCmd = new RelayCommand
+                (
+                    execute: parameter =>
+                    {
+                        IsEditMode = false;
+                        EditUser = SelectedUser;
+
+                        if (parameter is object[] values && values.Length == 2)
+                        {
+                            ((PasswordBox)values[0]).Password = "";
+                            ((PasswordBox)values[1]).Password = "";
+                        }
+                    },
+                    canExecute: _ => IsEditMode == true
+                    
+                );
         }
-
         private void ExecuteSave (object parameter)
         {
 
             if (parameter is object[] values && values.Length == 2)
             {
-                string val1 = values[0] as string ?? "";
-                string val2 = values[1] as string ?? "";
-                MessageBox.Show($"Beérkező: {val1} és {val2}");
+                string val1 = ((PasswordBox)values[0]).Password;
+                string val2 = ((PasswordBox)values[1]).Password;
+
+                if (val1 != val2) 
+                {
+                    MessageBox.Show(" A két jelszó nem egyezik");
+
+                }
+                else
+                {
+                    ((PasswordBox)values[0]).Password = "";
+                    ((PasswordBox)values[1]).Password = "";
+                    IsEditMode = false;
+                    EditUser.Password = val1;
+
+                }
+
             }
 
-            IsEnabled = false;
 
         }
 
-        private bool CanExecuteSave(object parameter) => IsEnabled;
+        private bool CanExecuteSave(object parameter) => IsEditMode;
 
         private User _selectedUser;
 
@@ -111,13 +165,7 @@ namespace ITAssets
                     else
                     {
 
-                        EditUser = new User
-                        {
-                            ID = _selectedUser.ID,
-                            UserName = _selectedUser.UserName,
-                            Password = _selectedUser.Password,
-                            Email = _selectedUser.Email
-                        };
+                        EditUser = SelectedUser;
                     }
 
                 }
@@ -125,17 +173,36 @@ namespace ITAssets
         }
 
         private User _editUser;
+        private User _buffer1 = new User();
+        private User _buffer2 = new User();
+        private User target;
 
         public User EditUser
         {
             get => _editUser;
             set
             {
-                if (_editUser != value)
+
+                if (value == null)
                 {
-                    _editUser = value;
-                    OnPropertyChanged(nameof(EditUser));
+                    _buffer1.ID = 0;
+                    _buffer1.UserName = "";
+                    _buffer1.Password = "";
+                    _buffer1.Email = "";
+                    target = _buffer1;
                 }
+                else
+                {
+                    target = ReferenceEquals(EditUser, _buffer1) ? _buffer2 : _buffer1;
+
+                    target.ID = value.ID;
+                    target.UserName = value.UserName;
+                    target.Password = value.Password;
+                    target.Email = value.Email;
+                }
+
+                _editUser = target;
+                OnPropertyChanged(nameof(EditUser));
             }
         }
 
@@ -143,22 +210,22 @@ namespace ITAssets
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 
-        private bool _IsEnabled = false;
-        public bool IsEnabled
+        private bool _IsEditMode = false;
+        public bool IsEditMode
         {
-            get => _IsEnabled;
+            get => _IsEditMode;
             set
             {
-                if (_IsEnabled != value)
+                if (_IsEditMode != value)
                 {
-                    _IsEnabled = value;
-                    OnPropertyChanged(nameof(IsEnabled));
+                    _IsEditMode = value;
+                    OnPropertyChanged(nameof(IsEditMode));
                     OnPropertyChanged(nameof(IsGridEnabled));
                 }
             }
         }
 
-        public bool IsGridEnabled => !IsEnabled;
+        public bool IsGridEnabled => !IsEditMode;
 
         public class RelayCommand : ICommand
         {
@@ -197,7 +264,9 @@ namespace ITAssets
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            return values.Clone();
+            if (values.Length == 2 && values[0] is PasswordBox box1 && values[1] is PasswordBox box2)
+                return new[] { box1, box2 };
+            return null;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

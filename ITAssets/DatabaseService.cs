@@ -213,7 +213,44 @@ namespace ITAssets
         }
 
 
+        public DeleteResult DeleteUser(User user)
+        {
+            if (user is not null && user.ID > 0 )
+            {
 
+                try
+                {
+                    var query = "DELETE FROM users WHERE Id = @id";
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@id", user.ID);
+                    cmd.ExecuteNonQuery();
+                    return DeleteResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1451)
+                {
+                    return DeleteResult.ForeignKeyConstraint;
+                }
+                catch
+                {
+                    return DeleteResult.Error;
+                }
+            }
+            return DeleteResult.NothingToDelete;
+
+
+        }
     }
+
+    public enum DeleteResult
+    {
+        Success,
+        ForeignKeyConstraint,
+        Error,
+        NothingToDelete
+    }
+
+
 }
 
