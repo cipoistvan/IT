@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
@@ -30,20 +31,23 @@ namespace ITAssets
         }
 
         public User SelectedUser { get; set; }
-        public User EditUser { 
+        public User EditUser
+        {
             get
-                {
-                    return new User { UserName = "test" };
-                } 
-            
+            {
+                return new User { UserName = "test" };
             }
+
+        }
 
     }
 
-    public class UsersViewModel:INotifyPropertyChanged
+    public class UsersViewModel : INotifyPropertyChanged
     {
+        public DatabaseService DBConnection;
+        public bool _IsAddMode = false;
         public ObservableCollection<User> Users { get; }
-        
+
         public ICommand AddUserCmd { get; }
         public ICommand ModifyUserCmd { get; }
         public ICommand CancelUserCmd { get; }
@@ -54,13 +58,18 @@ namespace ITAssets
         public UsersViewModel()
         {
 
-            var DBConnection = new DatabaseService(App.connectionString);
+            DBConnection = new DatabaseService(App.connectionString);
             Users = DBConnection.GetUsers();
 
 
             AddUserCmd = new RelayCommand
                 (
-                    execute: _ => { },
+                    execute: _ =>
+                    {
+                        IsEditMode = true;
+                        _IsAddMode = true;
+                        EditUser = null;
+                    },
                     canExecute: _ => !IsEditMode
                 );
 
@@ -72,7 +81,8 @@ namespace ITAssets
 
             DeleteUserCmd = new RelayCommand
                 (
-                    execute: _ => {
+                    execute: _ =>
+                    {
                         var result = DBConnection.DeleteUser(SelectedUser);
 
                         switch (result)
@@ -95,7 +105,7 @@ namespace ITAssets
                                 break;
 
                         }
-                   
+
                     },
                     canExecute: _ => SelectedUser != null && !IsEditMode
 
@@ -108,6 +118,7 @@ namespace ITAssets
                     execute: parameter =>
                     {
                         IsEditMode = false;
+                        _IsAddMode = false;
                         EditUser = SelectedUser;
 
                         if (parameter is object[] values && values.Length == 2)
@@ -117,10 +128,10 @@ namespace ITAssets
                         }
                     },
                     canExecute: _ => IsEditMode == true
-                    
+
                 );
         }
-        private void ExecuteSave (object parameter)
+        private void ExecuteSave(object parameter)
         {
 
             if (parameter is object[] values && values.Length == 2)
@@ -128,22 +139,88 @@ namespace ITAssets
                 string val1 = ((PasswordBox)values[0]).Password;
                 string val2 = ((PasswordBox)values[1]).Password;
 
-                if (val1 != val2) 
-                {
-                    MessageBox.Show(" A két jelszó nem egyezik");
+                bool EmptyStoredPassword = string.IsNullOrEmpty(EditUser.Password);
+                bool InvalidStoredPassword = EmptyStoredPassword || InvalidPassword(EditUser.Password);
+                bool EmptyPasswords = string.IsNullOrEmpty(val1) && string.IsNullOrEmpty(val2);
+                bool EqualPasswords = val1 == val2;
 
+                if (EmptyStoredPassword && EmptyPasswords)
+                {
+                    MessageBox.Show("Nincs jelszó megadva");
+                }
+                else if (!EqualPasswords)
+                {
+                    MessageBox.Show("A két jelszó nem egyezik");
+                }
+
+                else if (EmptyPasswords && InvalidStoredPassword)
+                {
+                    MessageBox.Show("A jelenlegi jelszó nem biztonságosan tárolt, adjon meg újat!");
                 }
                 else
                 {
                     ((PasswordBox)values[0]).Password = "";
                     ((PasswordBox)values[1]).Password = "";
-                    IsEditMode = false;
-                    EditUser.Password = val1;
 
+                    if (InvalidStoredPassword || !BCrypt.Net.BCrypt.Verify(val1, EditUser.Password))
+                        EditUser.Password = BCrypt.Net.BCrypt.HashPassword(val1);
+
+
+                    UpdateResult result;
+
+                    if (_IsAddMode)
+                    {
+                        result = DBConnection.AddUser(EditUser);
+                    }
+                    else
+                    {
+                        result = DBConnection.ModifyUser(EditUser);
+                    }
+
+
+
+                    switch (result)
+                    {
+                        case UpdateResult.Success:
+                            SelectedUser = null;
+                            Users.Clear();
+                            foreach (var user in DBConnection.GetUsers())
+                            {
+                                Users.Add(user);
+                            }
+
+                            EditUser.Password = "";
+                            _IsAddMode = false;
+                            IsEditMode = false;
+
+                            break;
+
+                        case UpdateResult.Duplicate:
+                            MessageBox.Show("Ilyen email címmel már létezik felhasználó, adj meg másikat !");
+                            break;
+
+                        case UpdateResult.Error:
+                            MessageBox.Show("Ismeretlen adatbázis hiba történt.");
+                            break;
+                    }
                 }
-
             }
+        }
 
+
+        public static bool InvalidPassword(string hash)
+        {
+
+            try
+            {
+                BCrypt.Net.BCrypt.Verify("", hash);
+                return false;
+            }
+            catch (BCrypt.Net.SaltParseException)
+
+            {
+                return true;
+            }
 
         }
 
@@ -274,6 +351,5 @@ namespace ITAssets
             throw new NotImplementedException();
         }
     }
-
 
 }

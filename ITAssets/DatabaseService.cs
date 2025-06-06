@@ -1,6 +1,7 @@
 ﻿using MySqlConnector;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Windows;
 
 namespace ITAssets
 {
@@ -13,7 +14,6 @@ namespace ITAssets
             this.connectionString = connectionString;
         }
 
-        // Külön metódus a kapcsolat létrehozására
         public MySqlConnection GetConnection()
         {
             try
@@ -30,14 +30,11 @@ namespace ITAssets
 
         }
 
-        // Általános lekérdező (csak olvasásra)
         public MySqlDataReader ExecuteQuery(MySqlConnection conn, string query)
         {
             var cmd = new MySqlCommand(query, conn);
-            return cmd.ExecuteReader(CommandBehavior.CloseConnection); // automatikus close
+            return cmd.ExecuteReader(CommandBehavior.CloseConnection);
         }
-
-        // Speciális lekérdezés: beszerzések megjelenítéséhez
         public List<Purchase> GetPurchases()
         {
             var list = new List<Purchase>();
@@ -238,9 +235,87 @@ namespace ITAssets
                 }
             }
             return DeleteResult.NothingToDelete;
+        }
+
+        public UpdateResult ModifyUser(User user)
+        {
+            if (user is not null)
+            {
+
+                try
+                {
+                    var query = @"UPDATE users 
+                                SET username = @username,
+                                    passwordhash = @password,
+                                    email = @email
+                                WHERE Id = @id";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@id", user.ID);
+                    cmd.Parameters.AddWithValue("@username", user.UserName);
+                    cmd.Parameters.AddWithValue("@password", user.Password);
+                    cmd.Parameters.AddWithValue("@email", user.Email);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
 
 
         }
+
+        public UpdateResult AddUser(User user)
+        {
+            if (user is not null)
+            {
+
+                try
+                {
+                    var query = @"INSERT INTO users (username, passwordhash, email)
+                                VALUES (@username, @password, @email)";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@username", user.UserName);
+                    cmd.Parameters.AddWithValue("@password", user.Password);
+                    cmd.Parameters.AddWithValue("@email", user.Email);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+
+
+        }
+
+
+
+
+
     }
 
     public enum DeleteResult
@@ -250,6 +325,15 @@ namespace ITAssets
         Error,
         NothingToDelete
     }
+
+    public enum UpdateResult
+    {
+        Success,
+        Duplicate,
+        Error,
+        NothingToUpdate
+    }
+
 
 
 }

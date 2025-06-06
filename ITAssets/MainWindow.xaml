@@ -131,7 +131,7 @@
                 <TabItem Header="Felhasználók">
                     <Grid Background="#FFE5E5E5">
 
-                        <DataGrid ItemsSource="{Binding UserVM.Users}" AutoGenerateColumns="False" Margin="0,0,0,101" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding UserVM.SelectedUser}" IsEnabled="{Binding UserVM.IsGridEnabled}" SelectionMode="Single">
+                        <DataGrid ItemsSource="{Binding UserVM.Users}" AutoGenerateColumns="False" Margin="8,10,10,101" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding UserVM.SelectedUser}" IsEnabled="{Binding UserVM.IsGridEnabled}" SelectionMode="Single">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
                                 <DataGridTextColumn Header="Felhasználó" Binding="{Binding UserName}"/>
@@ -139,21 +139,21 @@
                                 <DataGridTextColumn Header="Email" Binding="{Binding Email}"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.AddUserCmd}"/>
-                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="63,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.ModifyUserCmd}"/>
-                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="136,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.DeleteUserCmd}"/>
+                        <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.AddUserCmd}" Width="75"/>
+                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="88,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.ModifyUserCmd}" Width="75"/>
+                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="168,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.DeleteUserCmd}" Width="77"/>
 
                         <Label Content="Felhasználó:" HorizontalAlignment="Left" Margin="399,0,0,64" VerticalAlignment="Bottom"/>
                         <TextBox HorizontalAlignment="Left" Margin="478,0,0,62" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.UserName}" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24"/>
 
                         <Label Content="Jelszó:" HorizontalAlignment="Left" Margin="429,0,0,33" VerticalAlignment="Bottom"/>
                         <PasswordBox x:Name="pwdBox1" HorizontalAlignment="Left" Margin="478,0,0,33" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24"/>
-                        <PasswordBox x:Name="pwdBox2" HorizontalAlignment="Left" Margin="603,0,0,33"  IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <PasswordBox x:Name="pwdBox2" HorizontalAlignment="Left" Margin="603,0,0,33"  IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="131" Height="24"/>
 
                         <Label Content="Email:" HorizontalAlignment="Left" Margin="432,0,0,5" VerticalAlignment="Bottom"/>
                         <TextBox HorizontalAlignment="Left" Margin="478,0,0,4" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.Email}" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24"/>
 
-                        <Button Content="Mentés" HorizontalAlignment="Left" Margin="603,0,0,6" VerticalAlignment="Bottom" Command="{Binding UserVM.SaveUserCmd}">
+                        <Button Content="Mentés" HorizontalAlignment="Left" Margin="603,0,0,6" VerticalAlignment="Bottom" Command="{Binding UserVM.SaveUserCmd}" Width="60">
                             <Button.CommandParameter>
                                 <MultiBinding Converter="{StaticResource MultiParamConverter}">
                                     <Binding ElementName="pwdBox1"/>
@@ -161,8 +161,8 @@
                                 </MultiBinding>
                             </Button.CommandParameter>
                         </Button>
-                        <Button Content="Mégse" HorizontalAlignment="Left" Margin="680,0,0,5" VerticalAlignment="Bottom" Command="{Binding UserVM.CancelUserCmd}">
-                        <Button.CommandParameter>
+                        <Button Content="Mégse" HorizontalAlignment="Left" Margin="674,0,0,6" VerticalAlignment="Bottom" Command="{Binding UserVM.CancelUserCmd}" Width="60">
+                            <Button.CommandParameter>
                                 <MultiBinding Converter="{StaticResource MultiParamConverter}">
                                     <Binding ElementName="pwdBox1"/>
                                     <Binding ElementName="pwdBox2"/>
