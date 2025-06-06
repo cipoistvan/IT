@@ -54,12 +54,14 @@ namespace ITAssets
         public ICommand DeleteUserCmd { get; }
         public ICommand SaveUserCmd { get; }
 
-
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        
         public UsersViewModel()
         {
 
             DBConnection = new DatabaseService(App.connectionString);
-            Users = DBConnection.GetUsers();
+            Users = new ObservableCollection<User>(DBConnection.GetUsers());
 
 
             AddUserCmd = new RelayCommand
@@ -207,7 +209,6 @@ namespace ITAssets
             }
         }
 
-
         public static bool InvalidPassword(string hash)
         {
 
@@ -283,8 +284,7 @@ namespace ITAssets
             }
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
 
 
         private bool _IsEditMode = false;
@@ -304,36 +304,38 @@ namespace ITAssets
 
         public bool IsGridEnabled => !IsEditMode;
 
-        public class RelayCommand : ICommand
+        
+    }
+
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object?> _execute;
+        private readonly Predicate<object?>? _canExecute;
+        public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
         {
-            private readonly Action<object?> _execute;
-            private readonly Predicate<object?>? _canExecute;
-            public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
-            {
-                _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-                _canExecute = canExecute;
-            }
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
 
-            public bool CanExecute(object? parameter)
-            {
-                return _canExecute == null || _canExecute(parameter);
-            }
+        public bool CanExecute(object? parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
 
-            public void Execute(object? parameter)
-            {
-                _execute(parameter);
-            }
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
 
-            public event EventHandler? CanExecuteChanged
-            {
-                add => CommandManager.RequerySuggested += value;
-                remove => CommandManager.RequerySuggested -= value;
-            }
+        public event EventHandler? CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
 
-            public void RaiseCanExecuteChanged()
-            {
-                CommandManager.InvalidateRequerySuggested();
-            }
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
         }
     }
 

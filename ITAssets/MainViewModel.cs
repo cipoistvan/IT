@@ -20,6 +20,7 @@ namespace ITAssets
             ITAssemblyVM = new ITAssemblyViewModel();
             ASPartVM = new ASPartsViewModel();
             UserVM = new UsersViewModel();
+            
         }
     }
 }

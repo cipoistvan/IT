@@ -8,12 +8,10 @@ namespace ITAssets
     public class DatabaseService
     {
         private readonly string connectionString;
-
         public DatabaseService(string connectionString)
         {
             this.connectionString = connectionString;
         }
-
         public MySqlConnection GetConnection()
         {
             try
@@ -29,7 +27,6 @@ namespace ITAssets
             }
 
         }
-
         public MySqlDataReader ExecuteQuery(MySqlConnection conn, string query)
         {
             var cmd = new MySqlCommand(query, conn);
@@ -74,8 +71,6 @@ namespace ITAssets
 
             return list;
         }
-
-
         public List<Part> GetParts()
         {
             var list = new List<Part>();
@@ -84,6 +79,7 @@ namespace ITAssets
             SELECT 
                 p.id AS ID,
                 p.name AS Name,
+                p.categoryid as CategoryId,
                 c.name AS Category
             FROM parts p
             JOIN categories c ON p.categoryid = c.id
@@ -99,13 +95,41 @@ namespace ITAssets
                 {
                     ID = reader.GetInt32("ID"),
                     Name = reader.GetString("Name"),
+                    CategoryId = reader.GetInt32("CategoryId"),
                     CategoryName = reader.GetString("Category"),
                 });
             }
 
             return list;
         }
+        public List<Category> GetCategories()
+        {
+            var list = new List<Category>();
 
+            var query = @"
+            SELECT 
+                c.id AS ID,
+                c.name AS Name
+                
+            FROM categories c
+            ORDER BY c.name";
+
+            using var conn = GetConnection();
+
+            using var reader = ExecuteQuery(conn, query);
+
+            while (reader.Read())
+            {
+                list.Add(new Category
+                {
+                    ID = reader.GetInt32("ID"),
+                    Name = reader.GetString("Name"),
+                    
+                });
+            }
+
+            return list;
+        }
         public List<ITAssembly> GetITAssemblies()
         {
             var list = new List<ITAssembly>();
@@ -137,7 +161,6 @@ namespace ITAssets
 
             return list;
         }
-
         public List<ASPart> GetASParts()
         {
             var list = new List<ASPart>();
@@ -175,10 +198,9 @@ namespace ITAssets
 
             return list;
         }
-
-        public ObservableCollection<User> GetUsers()
+        public List<User> GetUsers()
         {
-            var list = new ObservableCollection<User>();
+            var list = new List<User>();
 
             var query = @"
                 SELECT 
@@ -208,8 +230,6 @@ namespace ITAssets
 
             return list;
         }
-
-
         public DeleteResult DeleteUser(User user)
         {
             if (user is not null && user.ID > 0 )
@@ -236,7 +256,6 @@ namespace ITAssets
             }
             return DeleteResult.NothingToDelete;
         }
-
         public UpdateResult ModifyUser(User user)
         {
             if (user is not null)
@@ -272,10 +291,7 @@ namespace ITAssets
                 }
             }
             return UpdateResult.NothingToUpdate;
-
-
         }
-
         public UpdateResult AddUser(User user)
         {
             if (user is not null)
@@ -311,13 +327,7 @@ namespace ITAssets
 
 
         }
-
-
-
-
-
     }
-
     public enum DeleteResult
     {
         Success,
@@ -325,7 +335,6 @@ namespace ITAssets
         Error,
         NothingToDelete
     }
-
     public enum UpdateResult
     {
         Success,
@@ -333,8 +342,5 @@ namespace ITAssets
         Error,
         NothingToUpdate
     }
-
-
-
 }
 

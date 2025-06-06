@@ -23,13 +23,5 @@ namespace ITAssets
             DataContext = new MainViewModel();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void UserSave_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }
