@@ -230,6 +230,41 @@ namespace ITAssets
 
             return list;
         }
+        public User GetUser(User user)
+        {
+
+            var query = @"
+                SELECT 
+                u.id AS ID,
+                u.username AS UserName,
+                u.passwordhash as Password,
+                u.email AS Email
+       
+                FROM users u
+                WHERE u.email = @email
+                ";
+
+            using var conn = GetConnection();
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@email", user.Email);
+            var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                user = new User
+                {
+                    ID = reader.GetInt32("ID"),
+                    UserName = reader.GetString("UserName"),
+                    Password = reader.GetString("Password"),
+                    Email = reader.GetString("Email")
+                };
+
+
+                return user;
+            }
+
+            return null;
+        }
+
         public DeleteResult DeleteUser(User user)
         {
             if (user is not null && user.ID > 0 )

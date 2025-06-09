@@ -13,6 +13,7 @@ namespace ITAssets
         public DesignITAssembyViewModel ITAssemblyVM { get; set; }
         public DesignASPartsViewModel ASPartVM { get; set; }
         public DesignUsersViewModel UserVM { get; set; }
+        public DesignLoginViewModel LoginVM { get; set; }
         public DesignMainViewModel()
         {
             PurchaseVM = new DesignPurchasesViewModel();
@@ -20,6 +21,7 @@ namespace ITAssets
             ITAssemblyVM = new DesignITAssembyViewModel();
             ASPartVM = new DesignASPartsViewModel();
             UserVM = new DesignUsersViewModel();
+            LoginVM = new DesignLoginViewModel();
         }
     }
 }

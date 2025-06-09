@@ -11,6 +11,9 @@
             
         </ResourceDictionary>-->
         <local:MultiParamConverter x:Key="MultiParamConverter"/>
+        <local:HideControl x:Key="HideControl"/>
+        <local:ShowTab x:Key="ShowTab"/>
+        <local:HideTab x:Key="HideTab"/>
     </Application.Resources>
 
 

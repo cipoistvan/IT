@@ -12,23 +12,47 @@
 
     Title="MainWindow" Background="Transparent" SizeToContent="WidthAndHeight" MinHeight="500" MinWidth="800">
     <Window.Resources>
-        
+
         <Style x:Key="RightAlignedText" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
         <local:MultiParamConverter x:Key="MultiParamConverter"/>
+        <local:HideControl x:Key="HideControl"/>
+        <local:ShowTab x:Key="ShowTab"/>
+        <local:HideTab x:Key="HideTab"/>
     </Window.Resources>
 
 
     <Border CornerRadius="10" Background="White" BorderThickness="5,5,5,5" BorderBrush="Black">
         <Grid Margin="20">
-            <Button Content="Belépés" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-            <Label Content="IT nyilvántartó" HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
-            <Label Content="felhasználó:" HorizontalAlignment="Left" Margin="552,12,0,0" VerticalAlignment="Top"/>
-            <TextBox HorizontalAlignment="Left" Margin="630,16,0,0" TextWrapping="Wrap" Text="Nincs belépve" VerticalAlignment="Top" Width="120" Height="22"/>
-            <TabControl Margin="0,48,0,0">
-                <TabItem Header="Beszerzés" IsSelected="True">
+            <Button Content="Belépés" HorizontalAlignment="Left" Margin="0,12,0,0" VerticalAlignment="Top" Width="60" Command="{Binding LoginVM.LoginStart}"/>
+            <Label Content="E-mail:" HorizontalAlignment="Left" Margin="60,10,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" Visibility="{Binding LoginVM.IsLoginMode, Converter={StaticResource HideControl }}"/>
+            <TextBox TextWrapping="Wrap" Text="{Binding LoginVM.LoginUser.Email}" VerticalAlignment="Top" Height="22" Margin="106,12,0,0" HorizontalAlignment="Left" Width="129" Visibility="{Binding LoginVM.IsLoginMode, Converter={StaticResource HideControl}}"/>
+            <Label Content="Jelszó:" HorizontalAlignment="Left" Margin="62,37,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" Visibility="{Binding LoginVM.IsLoginMode, Converter={StaticResource HideControl}}"/>
+            <PasswordBox x:Name="Loginpwd" VerticalAlignment="Top" Height="22" Margin="106,41,0,0" HorizontalAlignment="Left" Width="129" Visibility="{Binding LoginVM.IsLoginMode, Converter={StaticResource HideControl}}"/>
+            <Button Content="Ok" HorizontalAlignment="Left" Margin="240,12,0,0" VerticalAlignment="Top"  Width="60"
+                    Command="{Binding LoginVM.Login}" 
+                    CommandParameter="{Binding ElementName=Loginpwd}"
+                    Visibility="{Binding LoginVM.IsLoginMode, Converter={StaticResource HideControl}}">
+            </Button>
+
+            <Button Content="Mégse" HorizontalAlignment="Left" Margin="240,43,0,0" VerticalAlignment="Top"  Width="60" 
+                    Command="{Binding LoginVM.LoginCancel}" 
+                    CommandParameter="{Binding ElementName=Loginpwd}"
+                    Visibility="{Binding LoginVM.IsLoginMode, Converter={StaticResource HideControl}}">
+            </Button>
+
+            <Label Content="IT nyilvántartó" Margin="0,10,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Width="122"/>
+            <Label Content="felhasználó:" Margin="0,10,159,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72"/>
+            <TextBox TextWrapping="Wrap" Text="{Binding LoginVM.LoginUser.UserName}" IsEnabled="False" VerticalAlignment="Top" Height="22" Margin="0,12,10,0" HorizontalAlignment="Right" Width="144"/>
+            <TabControl Margin="0,70,0,0" SelectedIndex="{Binding SelectedTab}">
+                <TabItem Header="Információ" Visibility="{Binding IsLoggedIn, Converter={StaticResource HideTab}}">
+                    <Grid>
+                        <Label>Kérem jelentkezzen be!</Label>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Beszerzés" Visibility="{Binding IsLoggedIn, Converter={StaticResource ShowTab}}">
                     <Grid Background="#FFE5E5E5">
                         <DataGrid ItemsSource="{Binding PurchaseVM.Purchases}" AutoGenerateColumns="False" Margin="0,0,0,101" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" Grid.ColumnSpan="2">
                             <DataGrid.Columns>
@@ -58,7 +82,7 @@
 
                     </Grid>
                 </TabItem>
-                <TabItem Header="Alkatrészek" Height="20" VerticalAlignment="Top">
+                <TabItem Header="Alkatrészek" Visibility="{Binding IsLoggedIn, Converter={StaticResource ShowTab}}">
                     <Grid Background="#FFE5E5E5">
 
                         <DataGrid ItemsSource="{Binding PartVM.Parts}" AutoGenerateColumns="False" Margin="8,10,10,101" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding PartVM.SelectedPart}" IsEnabled="{Binding PartVM.IsGridEnabled}" SelectionMode="Single" >
@@ -85,7 +109,7 @@
 
                     </Grid>
                 </TabItem>
-                <TabItem Header="Összeszerelés">
+                <TabItem Header="Összeszerelés" Visibility="{Binding IsLoggedIn, Converter={StaticResource ShowTab}}">
                     <Grid Background="#FFE5E5E5">
 
                         <DataGrid ItemsSource="{Binding ITAssemblyVM.ITAssemblies}" AutoGenerateColumns="False" Margin="10,33,0,129" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HorizontalAlignment="Left" Width="230">
@@ -130,10 +154,14 @@
                         <Label Content="Összesen:" HorizontalAlignment="Left" Margin="554,0,0,9" VerticalAlignment="Bottom"/>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Felhasználók">
+                <TabItem Header="Felhasználók" Visibility="{Binding IsLoggedIn, Converter={StaticResource ShowTab}}">
                     <Grid Background="#FFE5E5E5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="49*"/>
+                            <ColumnDefinition Width="323*"/>
+                        </Grid.ColumnDefinitions>
 
-                        <DataGrid ItemsSource="{Binding UserVM.Users}" AutoGenerateColumns="False" Margin="8,10,10,101" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding UserVM.SelectedUser}" IsEnabled="{Binding UserVM.IsGridEnabled}" SelectionMode="Single">
+                        <DataGrid ItemsSource="{Binding UserVM.Users}" AutoGenerateColumns="False" Margin="8,10,10,101" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding UserVM.SelectedUser}" IsEnabled="{Binding UserVM.IsGridEnabled}" SelectionMode="Single" Grid.ColumnSpan="2">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
                                 <DataGridTextColumn Header="Felhasználó" Binding="{Binding UserName}"/>
@@ -142,20 +170,20 @@
                             </DataGrid.Columns>
                         </DataGrid>
                         <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.AddUserCmd}" Width="75"/>
-                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="88,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.ModifyUserCmd}" Width="75"/>
-                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="168,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.DeleteUserCmd}" Width="77"/>
+                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="88,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.ModifyUserCmd}" Width="75" Grid.ColumnSpan="2"/>
+                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="70,0,0,64" VerticalAlignment="Bottom" Command="{Binding UserVM.DeleteUserCmd}" Width="77" Grid.Column="1"/>
 
-                        <Label Content="Felhasználó:" HorizontalAlignment="Left" Margin="399,0,0,64" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="478,0,0,62" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.UserName}" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Felhasználó:" HorizontalAlignment="Left" Margin="301,0,0,64" VerticalAlignment="Bottom" Grid.Column="1"/>
+                        <TextBox HorizontalAlignment="Left" Margin="380,0,0,62" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.UserName}" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24" Grid.Column="1"/>
 
-                        <Label Content="Jelszó:" HorizontalAlignment="Left" Margin="429,0,0,33" VerticalAlignment="Bottom"/>
-                        <PasswordBox x:Name="pwdBox1" HorizontalAlignment="Left" Margin="478,0,0,33" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24"/>
-                        <PasswordBox x:Name="pwdBox2" HorizontalAlignment="Left" Margin="603,0,0,33"  IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="131" Height="24"/>
+                        <Label Content="Jelszó:" HorizontalAlignment="Left" Margin="331,0,0,33" VerticalAlignment="Bottom" Grid.Column="1"/>
+                        <PasswordBox x:Name="pwdBox1" HorizontalAlignment="Left" Margin="380,0,0,33" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24" Grid.Column="1"/>
+                        <PasswordBox x:Name="pwdBox2" HorizontalAlignment="Left" Margin="505,0,0,33"  IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="131" Height="24" Grid.Column="1"/>
 
-                        <Label Content="Email:" HorizontalAlignment="Left" Margin="432,0,0,5" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="478,0,0,4" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.Email}" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24"/>
+                        <Label Content="Email:" HorizontalAlignment="Left" Margin="334,0,0,5" VerticalAlignment="Bottom" Grid.Column="1"/>
+                        <TextBox HorizontalAlignment="Left" Margin="380,0,0,4" TextWrapping="Wrap" Text="{Binding UserVM.EditUser.Email}" IsEnabled="{Binding UserVM.IsEditMode}" VerticalAlignment="Bottom" Width="120" Height="24" Grid.Column="1"/>
 
-                        <Button Content="Mentés" HorizontalAlignment="Left" Margin="603,0,0,6" VerticalAlignment="Bottom" Command="{Binding UserVM.SaveUserCmd}" Width="60">
+                        <Button Content="Mentés" HorizontalAlignment="Left" Margin="505,0,0,6" VerticalAlignment="Bottom" Command="{Binding UserVM.SaveUserCmd}" Width="60" Grid.Column="1">
                             <Button.CommandParameter>
                                 <MultiBinding Converter="{StaticResource MultiParamConverter}">
                                     <Binding ElementName="pwdBox1"/>
@@ -163,7 +191,7 @@
                                 </MultiBinding>
                             </Button.CommandParameter>
                         </Button>
-                        <Button Content="Mégse" HorizontalAlignment="Left" Margin="674,0,0,6" VerticalAlignment="Bottom" Command="{Binding UserVM.CancelUserCmd}" Width="60">
+                        <Button Content="Mégse" HorizontalAlignment="Left" Margin="576,0,0,6" VerticalAlignment="Bottom" Command="{Binding UserVM.CancelUserCmd}" Width="60" Grid.Column="1">
                             <Button.CommandParameter>
                                 <MultiBinding Converter="{StaticResource MultiParamConverter}">
                                     <Binding ElementName="pwdBox1"/>

@@ -56,7 +56,7 @@ namespace ITAssets
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        
+
         public UsersViewModel()
         {
 
@@ -304,7 +304,7 @@ namespace ITAssets
 
         public bool IsGridEnabled => !IsEditMode;
 
-        
+
     }
 
     public class RelayCommand : ICommand
@@ -353,5 +353,53 @@ namespace ITAssets
             throw new NotImplementedException();
         }
     }
+
+    public class HideControl : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool mode = (bool)value;
+            if (mode)
+                return Visibility.Visible;
+            return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (Visibility)value == Visibility.Visible;
+        }
+    }
+    public class ShowTab : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool mode = (bool)value;
+            if (mode)
+                return Visibility.Visible;
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (Visibility)value == Visibility.Visible;
+        }
+    }
+
+    public class HideTab : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool mode = (bool)value;
+            if (mode)
+                return Visibility.Collapsed;
+            return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (Visibility)value == Visibility.Visible;
+        }
+    }
+
 
 }

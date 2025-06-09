@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data;
 using System.Windows;
 using MySqlConnector;
+using System.Diagnostics;
 
 namespace ITAssets
 {
@@ -17,7 +18,11 @@ namespace ITAssets
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
             try
+                
+
+
             {
                 new DatabaseService(App.connectionString).GetConnection();
                 //MessageBox.Show("Sikeres adatbázis kapcsolat!", "Kapcsolat teszt", MessageBoxButton.OK, MessageBoxImage.Information);
