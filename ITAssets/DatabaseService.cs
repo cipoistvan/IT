@@ -38,13 +38,16 @@ namespace ITAssets
 
             var query = @"
             SELECT 
-                p.id AS ID,
-                p.date AS Date,
-                u.username AS User,
-                pr.name AS ItemName,
-                c.name AS Type,
-                p.quantity AS Quantity,
-                p.unitprice AS UnitPrice
+                p.id AS id,
+                p.userid as userid,
+                u.username AS username,
+                p.partid as partid,
+                pr.name AS partname,
+                c.id as categoryid,
+                c.name AS categoryname,
+                p.quantity AS quantity,
+                p.unitprice AS unitprice,
+                p.date AS date
             FROM purchases p
             JOIN users u ON p.userid = u.id
             JOIN parts pr ON p.partid = pr.id
@@ -60,17 +63,48 @@ namespace ITAssets
                 list.Add(new Purchase
                 {
                     ID = reader.GetInt32("ID"),
-                    Date = reader.GetDateTime("Date"),
-                    User = reader.GetString("User"),
-                    ItemName = reader.GetString("ItemName"),
-                    Type = reader.GetString("Type"),
-                    Quantity = reader.GetInt32("Quantity"),
-                    UnitPrice = reader.GetDecimal("UnitPrice")
+                    UserId = reader.GetInt32("userid"),
+                    UserName = reader.GetString("username"),
+                    PartId = reader.GetInt32("partid"),
+                    PartName = reader.GetString("partname"),
+                    CategoryId = reader.GetInt32("categoryid"),
+                    CategoryName = reader.GetString("categoryname"),
+                    Quantity = reader.GetInt32("quantity"),
+                    UnitPrice = reader.GetDecimal("unitprice"),
+                    Date = reader.GetDateTime("date"),
                 });
             }
 
             return list;
         }
+        public DeleteResult DeletePurchase(Purchase purchase)
+        {
+            if (purchase is not null && purchase.ID > 0)
+            {
+
+                try
+                {
+                    var query = "DELETE FROM purchases WHERE Id = @id";
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@id", purchase.ID);
+                    cmd.ExecuteNonQuery();
+                    return DeleteResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1451)
+                {
+                    return DeleteResult.ForeignKeyConstraint;
+                }
+                catch
+                {
+                    return DeleteResult.Error;
+                }
+            }
+            return DeleteResult.NothingToDelete;
+        }
+
+
         public List<Part> GetParts()
         {
             var list = new List<Part>();
@@ -130,6 +164,101 @@ namespace ITAssets
 
             return list;
         }
+        public DeleteResult DeletePart(Part part)
+        {
+            if (part is not null && part.ID > 0)
+            {
+
+                try
+                {
+                    var query = "DELETE FROM parts WHERE Id = @id";
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@id", part.ID);
+                    cmd.ExecuteNonQuery();
+                    return DeleteResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1451)
+                {
+                    return DeleteResult.ForeignKeyConstraint;
+                }
+                catch
+                {
+                    return DeleteResult.Error;
+                }
+            }
+            return DeleteResult.NothingToDelete;
+        }
+        public UpdateResult ModifyPart(Part part)
+        {
+            if (part is not null)
+            {
+
+                try
+                {
+                    var query = @"UPDATE parts 
+                                SET name = @name,
+                                    categoryid = @categoryid
+                                WHERE id = @id";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@id", part.ID);
+                    cmd.Parameters.AddWithValue("@name", part.Name);
+                    cmd.Parameters.AddWithValue("@categoryid", part.CategoryId);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+        }
+        public UpdateResult AddPart(Part part)
+        {
+            if (part is not null)
+            {
+
+                try
+                {
+                    var query = @"INSERT INTO parts (name, categoryid)
+                                VALUES (@name, @categoryid)";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@name", part.Name);
+                    cmd.Parameters.AddWithValue("@categoryid", part.CategoryId);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+
+
+        }
+
         public List<ITAssembly> GetITAssemblies()
         {
             var list = new List<ITAssembly>();
@@ -198,6 +327,8 @@ namespace ITAssets
 
             return list;
         }
+
+
         public List<User> GetUsers()
         {
             var list = new List<User>();
@@ -264,7 +395,6 @@ namespace ITAssets
 
             return null;
         }
-
         public DeleteResult DeleteUser(User user)
         {
             if (user is not null && user.ID > 0 )

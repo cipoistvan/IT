@@ -10,12 +10,15 @@ namespace ITAssets
     {
 
         public int ID{ get; set; }
-        public DateTime Date { get; set; }
-        public string User { get; set; }
-        public string ItemName { get; set; }
-        public string Type { get; set; }
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public int PartId { get; set; }
+        public string PartName { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public DateTime? Date { get; set; }
         public decimal Total => Quantity * UnitPrice;
     }
 }

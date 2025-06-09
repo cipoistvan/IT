@@ -85,26 +85,34 @@ namespace ITAssets
                 (
                     execute: _ =>
                     {
+                        var delOk =
+                        MessageBox.Show("Biztosan törölni szeretné?", "Megerősítés", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                        if (delOk == MessageBoxResult.Yes)
+                        {
+
                         var result = DBConnection.DeleteUser(SelectedUser);
 
-                        switch (result)
-                        {
-                            case DeleteResult.Success:
-                                SelectedUser = null;
-                                Users.Clear();
-                                foreach (var user in DBConnection.GetUsers())
-                                {
-                                    Users.Add(user);
-                                }
-                                break;
+                            switch (result)
+                            {
+                                case DeleteResult.Success:
+                                    SelectedUser = null;
+                                    Users.Clear();
+                                    foreach (var user in DBConnection.GetUsers())
+                                    {
+                                        Users.Add(user);
+                                    }
+                                    break;
 
-                            case DeleteResult.ForeignKeyConstraint:
-                                MessageBox.Show("Nem törölhető a felhasználó, mert más rekord hivatkozik rá.");
-                                break;
+                                case DeleteResult.ForeignKeyConstraint:
+                                    MessageBox.Show("Nem törölhető a felhasználó, mert más rekord hivatkozik rá.");
+                                    break;
 
-                            case DeleteResult.Error:
-                                MessageBox.Show("Ismeretlen adatbázis hiba történt.");
-                                break;
+                                case DeleteResult.Error:
+                                    MessageBox.Show("Ismeretlen adatbázis hiba történt.");
+                                    break;
+
+                            }
 
                         }
 
