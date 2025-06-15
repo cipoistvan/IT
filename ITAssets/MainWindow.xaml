@@ -47,9 +47,10 @@
             <Label Content="felhasználó:" Margin="0,10,159,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72"/>
             <TextBox TextWrapping="Wrap" Text="{Binding LoginVM.LoginUser.UserName}" IsEnabled="False" VerticalAlignment="Top" Height="22" Margin="0,12,10,0" HorizontalAlignment="Right" Width="144"/>
             <TabControl Margin="0,70,0,0" SelectedIndex="{Binding SelectedTab}">
-                <TabItem Header="Információ" Visibility="{Binding IsLoggedIn, Converter={StaticResource HideTab}}">
+                <TabItem Header="Információ" Visibility="Visible">
                     <Grid>
-                        <Label>Kérem jelentkezzen be!</Label>
+                        <Label Margin="0,10,0,276" HorizontalAlignment="Center" Width="366" FontSize="18" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Visibility="{Binding IsLoggedIn, Converter={StaticResource HideTab}}">Kérem jelentkezzen be!</Label>
+                        <TextBox HorizontalAlignment="Center" Width="724" Height="261" VerticalAlignment="Top" Margin="0,65,0,0" IsReadOnly="True" Text="{Binding LogText}"/>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Beszerzés" Visibility="{Binding IsLoggedIn, Converter={StaticResource ShowTab}}">
@@ -124,7 +125,7 @@
                                 <DataGridTextColumn Header="Felhasználó" Binding="{Binding UserName}"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DataGrid ItemsSource="{Binding ASPartVM.ASParts}" AutoGenerateColumns="False" Margin="257,10,0,119" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HorizontalAlignment="Left" Width="242">
+                        <DataGrid ItemsSource="{Binding ASPartVM.ASParts}" AutoGenerateColumns="False" Margin="257,10,0,119" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding ASPartVM.SelectedASPart}" IsEnabled="{Binding ITAssemblyVM.IsGridEnabled}" SelectionMode="Single" HorizontalAlignment="Left" Width="242">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
                                 <DataGridTextColumn Header="Eszköz" Binding="{Binding AssemblyName}"/>
@@ -133,7 +134,8 @@
                                 <DataGridTextColumn Header="Mennyiség" Binding="{Binding Quantity}"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DataGrid ItemsSource="{Binding PartVM.Parts}" AutoGenerateColumns="False" Margin="504,10,0,119" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HorizontalAlignment="Left" Width="230">
+                        <!--<DataGrid ItemsSource="{Binding ASPartVM.ASParts}" AutoGenerateColumns="False" Margin="257,10,0,119" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding ASPartVM.SelectedASPart}" IsEnabled="{Binding ITAssemblyVM.IsGridEnabled}" SelectionMode="Single" HorizontalAlignment="Left" Width="242">-->
+                        <DataGrid ItemsSource="{Binding PartVM.Parts}" AutoGenerateColumns="False" Margin="504,10,0,119" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding PartVM.SelectedPart}" IsEnabled="{Binding ITAssemblyVM.IsGridEnabled}" SelectionMode="Single" HorizontalAlignment="Left" Width="230">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
                                 <DataGridTextColumn Header="Megnevezés" Binding="{Binding Name}"/>
@@ -153,8 +155,8 @@
                         <Button Content="Mentés" HorizontalAlignment="Left" Margin="603,0,0,6" VerticalAlignment="Bottom" Command="{Binding ITAssemblyVM.SaveITAssemblyCmd}" Width="60"/>
                         <Button Content="Mégse" HorizontalAlignment="Left" Margin="674,0,0,6" VerticalAlignment="Bottom" Command="{Binding ITAssemblyVM.CancelITAssemblyCmd}" Width="60"/>
 
-                        <Button Content="Hozzáad" HorizontalAlignment="Left" Margin="504,0,0,94" VerticalAlignment="Bottom" Width="60" Command="{Binding ITAssemblyVM.AddToASPartCmd}"/>
-                        <Button Content="Elvesz" HorizontalAlignment="Left" Margin="256,0,0,94" Width="60" Command="{Binding ITAssemblyVM.RemoveFromASPartCmd}" Height="20" VerticalAlignment="Bottom"/>
+                        <Button Content="Hozzáad" HorizontalAlignment="Left" Margin="504,0,0,94" VerticalAlignment="Bottom" Width="60" Command="{Binding ASPartVM.AddASPartCmd}"/>
+                        <Button Content="Elvesz" HorizontalAlignment="Left" Margin="256,0,0,94" Width="60" Command="{Binding ASPartVM.DeleteASPartCmd}" Height="20" VerticalAlignment="Bottom"/>
 
                     </Grid>
                 </TabItem>

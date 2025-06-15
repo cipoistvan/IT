@@ -1,4 +1,5 @@
-﻿using MySqlConnector;
+﻿using Microsoft.Extensions.Logging;
+using MySqlConnector;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
@@ -23,8 +24,13 @@ namespace ITAssets
 
             catch (MySqlException ex)
             {
+                MessageBox.Show("Adatbázis kapcsolat hiba:\n" + ex.Message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+                App.logger.LogCritical(ex, "Adatbázis kapcsolat nem jött létre: ");
+                App.Current.Shutdown();
                 throw;
+
             }
+            
 
         }
         public MySqlDataReader ExecuteQuery(MySqlConnection conn, string query)
@@ -470,47 +476,118 @@ namespace ITAssets
         }
 
 
-
-
-
-
-
-        public List<ASPart> GetASParts()
+        public List<ASPart> GetASParts(int? assemblyid)
         {
             var list = new List<ASPart>();
 
             var query = @"
                 SELECT 
                 a.id AS ID,
+                a.assemblyid as AssemblyID,
+                ass.Name as AssemblyName,
+                a.partid as PartID,
                 p.name AS PartName,
-                ass.Name as ASName,
-                c.name AS Category,
+                c.id As CategoryID,
+                c.name AS CategoryName,
                 a.quantity as Quantity
        
                 FROM assemblyparts a
                 JOIN assemblies ass ON a.AssemblyId = ass.id
                 JOIN parts p ON a.partid = p.id
                 JOIN categories c ON p.categoryid = c.id
+                WHERE (@FAssemblyID is null or a.assemblyid = @FAssemblyID)
                 ORDER BY p.id";
 
-            using var conn = GetConnection();
 
-            using var reader = ExecuteQuery(conn, query);
+            using var conn = GetConnection();
+            var cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.AddWithValue("@FAssemblyID", assemblyid);
+
+            var reader = cmd.ExecuteReader();
 
             while (reader.Read())
             {
                 list.Add(new ASPart
                 {
                     ID = reader.GetInt32("ID"),
+                    AssemblyID = reader.GetInt32("AssemblyID"),
+                    AssemblyName = reader.GetString("AssemblyName"),
+                    PartID = reader.GetInt32("PartID"),
                     PartName = reader.GetString("PartName"),
-                    AssemblyName = reader.GetString("ASName"),
-                    CategoryName = reader.GetString("Category"),
+                    CategoryID = reader.GetInt32("CategoryID"),
+                    CategoryName = reader.GetString("CategoryName"),
                     Quantity = reader.GetInt32("Quantity"),
-
                 });
             }
 
             return list;
+        }
+        public List<ASPart> GetASParts()
+        {
+            return GetASParts(null);
+        }
+
+        public UpdateResult AddASPart(ASPart aspart)
+        {
+            if (aspart is not null)
+            {
+
+                try
+                {
+                    var query = @"INSERT INTO assemblyparts (assemblyid, partid, quantity)
+                                VALUES (@assemblyid, @partid, @quantity)";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+                    
+                    cmd.Parameters.AddWithValue("@assemblyid", aspart.AssemblyID);
+                    cmd.Parameters.AddWithValue("@partid", aspart.PartID);
+                    cmd.Parameters.AddWithValue("@quantity", aspart.Quantity);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+
+
+        }
+        public DeleteResult DeleteASPart(ASPart aspart)
+        {
+            if (aspart is not null && aspart.ID > 0)
+            {
+
+                try
+                {
+                    var query = "DELETE FROM assemblyparts WHERE Id = @id";
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@id", aspart.ID);
+                    cmd.ExecuteNonQuery();
+                    return DeleteResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1451)
+                {
+                    return DeleteResult.ForeignKeyConstraint;
+                }
+                catch
+                {
+                    return DeleteResult.Error;
+                }
+            }
+            return DeleteResult.NothingToDelete;
         }
 
 

@@ -22,16 +22,24 @@ namespace ITAssets
             PurchaseVM = new PurchasesViewModel(this);
             PartVM = new PartsViewModel();
             ITAssemblyVM = new ITAssemblyViewModel(this);
-            ASPartVM = new ASPartsViewModel();
+            ASPartVM = new ASPartsViewModel(this);
             UserVM = new UsersViewModel();
             LoginVM = new LoginViewModel(this);
         }
 
 
         private bool _isLoggedIn = false;
+        
         public bool IsLoggedIn
         {
-            get => _isLoggedIn;
+            get
+            {
+               // LoginVM.LoginUser = new User { ID = 1, UserName = "admin" };
+                
+
+                return _isLoggedIn;
+
+            }
             set
             {
                 if (_isLoggedIn != value)
@@ -56,6 +64,18 @@ namespace ITAssets
             }
         }
 
+        private string _logtext;
+        public string LogText
+        {
+            get {
+                return _logtext;
+            }
+            set
+            {
+                _logtext = value;
+                OnPropertyChanged(nameof(LogText));
+            }
 
+        }
     }
 }

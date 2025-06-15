@@ -20,7 +20,7 @@ namespace ITAssets
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
+            DataContext = App.MainVM;
         }
 
     }

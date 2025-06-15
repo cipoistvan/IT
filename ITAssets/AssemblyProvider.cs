@@ -189,11 +189,14 @@ namespace ITAssets
                     if (value is null)
                     {
                         EditITAssembly = null;
+                        mainviewmodel.ASPartVM.ASParts = null;
                     }
                     else
                     {
 
                         EditITAssembly = SelectedITAssembly;
+                        mainviewmodel.ASPartVM.ASParts = new ObservableCollection<ASPart>(DBConnection.GetASParts(SelectedITAssembly.ID));
+                        
                     }
 
                 }

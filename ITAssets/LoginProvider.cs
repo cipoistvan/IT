@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -53,6 +54,7 @@ namespace ITAssets
         {
             mainviewmodel = mainViewModel;
             DBConnection = new DatabaseService(App.connectionString);
+
             LoginUser = new User { Email = "", Password = "" };
 
             LoginStart = new RelayCommand(
@@ -105,10 +107,12 @@ namespace ITAssets
                 IsLoginMode = false;
                 mainviewmodel.IsLoggedIn = true;
                 mainviewmodel.SelectedTab = 4;
+                App.logger.LogInformation($"Sikeres bejelentkezés (Email: {LoginUser.Email})");
             }
             else
             {
                 MessageBox.Show("E-mail cím, vagy jelszó hibás !");
+                App.logger.LogWarning($"Érvénytelen bejelentkezési kísérlet (Email: {LoginUser.Email})");
             }
 
 
