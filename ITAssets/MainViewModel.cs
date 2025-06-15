@@ -19,16 +19,16 @@ namespace ITAssets
         public LoginViewModel LoginVM { get; set; }
         public MainViewModel()
         {
-            PurchaseVM = new PurchasesViewModel();
+            PurchaseVM = new PurchasesViewModel(this);
             PartVM = new PartsViewModel();
-            ITAssemblyVM = new ITAssemblyViewModel();
+            ITAssemblyVM = new ITAssemblyViewModel(this);
             ASPartVM = new ASPartsViewModel();
             UserVM = new UsersViewModel();
             LoginVM = new LoginViewModel(this);
         }
 
 
-        private bool _isLoggedIn = true;
+        private bool _isLoggedIn = false;
         public bool IsLoggedIn
         {
             get => _isLoggedIn;

@@ -46,8 +46,11 @@ namespace ITAssets
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public PurchasesViewModel()
+        private MainViewModel mainviewmodel;
+        public PurchasesViewModel(MainViewModel mainViewModel)
         {
+
+            mainviewmodel = mainViewModel;
 
             DBConnection = new DatabaseService(App.connectionString);
             Purchases = new ObservableCollection<Purchase>(DBConnection.GetPurchases());
@@ -61,7 +64,7 @@ namespace ITAssets
                        IsEditMode = true;
                        _IsAddMode = true;
                        EditPurchase = null;
-                       //SelectedCategory = null;
+                       SelectedPart = null;
                    },
                    canExecute: _ => !IsEditMode
                );
@@ -130,6 +133,44 @@ namespace ITAssets
 
         private void ExecuteSave(object parameter)
         {
+            UpdateResult result;
+
+
+            EditPurchase.UserId = mainviewmodel.LoginVM.LoginUser.ID;
+            if (_IsAddMode)
+            {
+                result = DBConnection.AddPurchase(EditPurchase);
+            }
+            else
+            {
+                result = DBConnection.ModifyPurchase(EditPurchase);
+            }
+
+            switch (result)
+            {
+                case UpdateResult.Success:
+                    SelectedPurchase = null;
+                    Purchases.Clear();
+                    foreach (var purchase in DBConnection.GetPurchases())
+                    {
+                        Purchases.Add(purchase);
+                    }
+
+                    _IsAddMode = false;
+                    IsEditMode = false;
+
+                    break;
+
+                case UpdateResult.Duplicate:
+                    MessageBox.Show("Ilyen alkatrész már létezik !");
+                    break;
+
+                case UpdateResult.Error:
+                    MessageBox.Show("Ismeretlen adatbázis hiba történt.");
+                    break;
+            }
+
+
         }
         private bool CanExecuteSave(object parameter) => IsEditMode;
 

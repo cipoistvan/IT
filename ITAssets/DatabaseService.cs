@@ -32,6 +32,8 @@ namespace ITAssets
             var cmd = new MySqlCommand(query, conn);
             return cmd.ExecuteReader(CommandBehavior.CloseConnection);
         }
+        
+        
         public List<Purchase> GetPurchases()
         {
             var list = new List<Purchase>();
@@ -102,6 +104,84 @@ namespace ITAssets
                 }
             }
             return DeleteResult.NothingToDelete;
+        }
+        public UpdateResult ModifyPurchase(Purchase purchase)
+        {
+            if (purchase is not null)
+            {
+
+                try
+                {
+                    var query = @"UPDATE purchases 
+                        set userid = @userid,
+                            partid = @partid,
+                            quantity = @quantity,
+                            unitprice = @unitprice,
+                            date = @date
+                            WHERE id = @id";
+
+                    using var conn = GetConnection();
+                    var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@id", purchase.ID);
+                    cmd.Parameters.AddWithValue("@userid", purchase.UserId);
+                    cmd.Parameters.AddWithValue("@partid", purchase.PartId);
+                    cmd.Parameters.AddWithValue("@quantity", purchase.Quantity);
+                    cmd.Parameters.AddWithValue("@unitprice", purchase.UnitPrice);
+                    cmd.Parameters.AddWithValue("@date", purchase.Date);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+        }
+        public UpdateResult AddPurchase(Purchase purchase)
+        {
+            if (purchase is not null)
+            {
+
+                try
+                {
+                    var query = @"INSERT INTO purchases (userid, partid, quantity, unitprice, date)
+                                VALUES (@userid, @partid, @quantity, @unitprice, @date)";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@userid", purchase.UserId);
+                    cmd.Parameters.AddWithValue("@partid", purchase.PartId);
+                    cmd.Parameters.AddWithValue("@quantity", purchase.Quantity);
+                    cmd.Parameters.AddWithValue("@unitprice", purchase.UnitPrice);
+                    cmd.Parameters.AddWithValue("@date", purchase.Date);
+                    
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+
+
         }
 
 
@@ -259,6 +339,7 @@ namespace ITAssets
 
         }
 
+
         public List<ITAssembly> GetITAssemblies()
         {
             var list = new List<ITAssembly>();
@@ -290,6 +371,110 @@ namespace ITAssets
 
             return list;
         }
+        public DeleteResult DeleteITAssembly(ITAssembly itassembly)
+        {
+            if (itassembly is not null && itassembly.ID > 0)
+            {
+
+                try
+                {
+                    var query = "DELETE FROM assemblies WHERE Id = @id";
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@id", itassembly.ID);
+                    cmd.ExecuteNonQuery();
+                    return DeleteResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1451)
+                {
+                    return DeleteResult.ForeignKeyConstraint;
+                }
+                catch
+                {
+                    return DeleteResult.Error;
+                }
+            }
+            return DeleteResult.NothingToDelete;
+        }
+        public UpdateResult AddITAssembly(ITAssembly itassembly)
+        {
+            if (itassembly is not null)
+            {
+
+                try
+                {
+                    var query = @"INSERT INTO assemblies (userid, name, date)
+                                VALUES (@userid, @name, @date)";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@userid", itassembly.UserId);
+                    cmd.Parameters.AddWithValue("@name", itassembly.Name);
+                    cmd.Parameters.AddWithValue("@date", itassembly.Date);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+
+
+        }
+        public UpdateResult ModifyITAssembly(ITAssembly itassembly)
+        {
+            if (itassembly is not null)
+            {
+
+                try
+                {
+                    var query = @"UPDATE assemblies 
+                                SET userid = @userid,
+                                    name = @name,
+                                    date = @date
+                                WHERE id = @id";
+
+                    using var conn = GetConnection();
+                    using var cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@id", itassembly.ID);
+                    cmd.Parameters.AddWithValue("@userid", itassembly.UserId);
+                    cmd.Parameters.AddWithValue("@name", itassembly.Name);
+                    cmd.Parameters.AddWithValue("@date", itassembly.Date);
+
+                    cmd.ExecuteNonQuery();
+                    return UpdateResult.Success;
+
+                }
+                catch (MySqlException ex) when (ex.Number == 1062)
+                {
+                    return UpdateResult.Duplicate;
+                }
+                catch
+                {
+                    return UpdateResult.Error;
+                }
+            }
+            return UpdateResult.NothingToUpdate;
+        }
+
+
+
+
+
+
+
         public List<ASPart> GetASParts()
         {
             var list = new List<ASPart>();
