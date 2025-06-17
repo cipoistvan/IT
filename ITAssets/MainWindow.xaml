@@ -54,37 +54,48 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Beszerzés" Visibility="{Binding IsLoggedIn, Converter={StaticResource ShowTab}}">
-                    <Grid Background="#FFE5E5E5">
-                        <DataGrid ItemsSource="{Binding PurchaseVM.Purchases}" AutoGenerateColumns="False" Margin="0,0,0,101" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding PurchaseVM.SelectedPurchase}" IsEnabled="{Binding PurchaseVM.IsGridEnabled}" SelectionMode="Single" Grid.ColumnSpan="2">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
-                                <DataGridTextColumn Header="Dátum" Binding="{Binding Date}"/>
-                                <DataGridTextColumn Header="Felhasználó" Binding="{Binding UserName}"/>
-                                <DataGridTextColumn Header="Terméknév" Binding="{Binding PartName}"/>
-                                <DataGridTextColumn Header="Típus" Binding="{Binding CategoryName}"/>
-                                <DataGridTextColumn Header="Mennyiség" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightAlignedText}"/>
-                                <DataGridTextColumn Header="Egységár" Binding="{Binding UnitPrice}" ElementStyle="{StaticResource RightAlignedText}"/>
-                                <DataGridTextColumn Header="Összesen" Binding="{Binding Total}" ElementStyle="{StaticResource RightAlignedText}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom" Width="60" Command="{Binding PurchaseVM.AddPurchaseCmd}"/>
-                        <Button Content="Módosítás" HorizontalAlignment="Left" Margin="73,0,0,64" VerticalAlignment="Bottom" Width="60" Command="{Binding PurchaseVM.ModifyPurchaseCmd}"/>
-                        <Button Content="Törlés" HorizontalAlignment="Left" Margin="138,0,0,64" VerticalAlignment="Bottom" Width="60" Command="{Binding PurchaseVM.DeletePurchaseCmd}"/>
-                        <DatePicker HorizontalAlignment="Left" Margin="632,0,0,62" VerticalAlignment="Bottom" SelectedDate="{Binding PurchaseVM.EditPurchase.Date}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
-                        <ComboBox ItemsSource="{Binding PurchaseVM.Parts}" HorizontalAlignment="Left" Margin="282,0,0,62" VerticalAlignment="Bottom" Width="241" DisplayMemberPath="Name" SelectedItem="{Binding PurchaseVM.SelectedPart}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
-                        <Label Content="Dátum:" HorizontalAlignment="Left" Margin="579,0,0,62" VerticalAlignment="Bottom" />
-                        <Label Content="Alkatrész:" HorizontalAlignment="Left" Margin="217,0,0,62" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="282,0,0,33" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="50" Height="24" Text="{Binding PurchaseVM.EditPurchase.Quantity}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
-                        <Label Content="Mennyiség:" HorizontalAlignment="Left" Margin="207,0,0,33" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="402,0,0,33" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="120" Height="24" Text="{Binding PurchaseVM.EditPurchase.UnitPrice}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
-                        <Label Content="Egységár:" HorizontalAlignment="Left" Margin="337,0,0,32" VerticalAlignment="Bottom"/>
-                        <TextBox HorizontalAlignment="Left" Margin="282,0,0,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="120" Height="24" Text="{Binding PurchaseVM.EditPurchase.Total, Mode=OneWay}" IsEnabled="False"/>
-                        <Label Content="Összesen:" HorizontalAlignment="Left" Margin="216,0,0,8" VerticalAlignment="Bottom"/>
-                        <Button Content="Mentés" HorizontalAlignment="Left" Margin="603,0,0,6" VerticalAlignment="Bottom" Command="{Binding PurchaseVM.SavePurchaseCmd}" Width="60"/>
-
-                        <Button Content="Mégse" HorizontalAlignment="Left" Margin="674,0,0,6" VerticalAlignment="Bottom" Command="{Binding PurchaseVM.CancelPurchaseCmd}" Width="60"/>
-
-
+                    <Grid Height="335">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5,5,5,305">
+                                <DatePicker SelectedDate="{Binding PurchaseVM.Filter.FromDate}" />
+                                <TextBlock Text=" - " Margin="5,0"/>
+                                <DatePicker SelectedDate="{Binding PurchaseVM.Filter.toDate}" />
+                                <TextBlock Text="Terméknév:" Margin="5,0" VerticalAlignment="Center"/>
+                                <TextBox Width="100" Height="22" Margin="5,1,5,1"></TextBox>
+                                <TextBlock Text="Típus" Margin="5,0" VerticalAlignment="Center"/>
+                                <TextBox Width="50" Height="22" Margin="5,1,5,1"></TextBox>
+                                <Button Content="Szűrés" Width="50" Command="{Binding ApplyFilterCommand}" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Background="#FFE5E5E5" Margin="0,36,0,0">
+                            <DataGrid ItemsSource="{Binding PurchaseVM.Purchases}" AutoGenerateColumns="False" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding PurchaseVM.SelectedPurchase}" IsEnabled="{Binding PurchaseVM.IsGridEnabled}" SelectionMode="Single" Margin="0,0,0,101">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
+                                    <DataGridTextColumn Header="Dátum" Binding="{Binding Date}"/>
+                                    <DataGridTextColumn Header="Felhasználó" Binding="{Binding UserName}"/>
+                                    <DataGridTextColumn Header="Terméknév" Binding="{Binding PartName}"/>
+                                    <DataGridTextColumn Header="Típus" Binding="{Binding CategoryName}"/>
+                                    <DataGridTextColumn Header="Mennyiség" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightAlignedText}"/>
+                                    <DataGridTextColumn Header="Egységár" Binding="{Binding UnitPrice}" ElementStyle="{StaticResource RightAlignedText}"/>
+                                    <DataGridTextColumn Header="Összesen" Binding="{Binding Total}" ElementStyle="{StaticResource RightAlignedText}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button Content="Felvitel" HorizontalAlignment="Left" Margin="8,0,0,64" VerticalAlignment="Bottom" Width="60" Command="{Binding PurchaseVM.AddPurchaseCmd}"/>
+                            <Button Content="Módosítás" HorizontalAlignment="Left" Margin="73,0,0,64" VerticalAlignment="Bottom" Width="60" Command="{Binding PurchaseVM.ModifyPurchaseCmd}"/>
+                            <Button Content="Törlés" HorizontalAlignment="Left" Margin="138,0,0,64" VerticalAlignment="Bottom" Width="60" Command="{Binding PurchaseVM.DeletePurchaseCmd}"/>
+                            <DatePicker HorizontalAlignment="Left" Margin="632,0,0,62" VerticalAlignment="Bottom" SelectedDate="{Binding PurchaseVM.EditPurchase.Date}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
+                            <ComboBox ItemsSource="{Binding PurchaseVM.Parts}" HorizontalAlignment="Left" Margin="282,0,0,62" VerticalAlignment="Bottom" Width="241" DisplayMemberPath="Name" SelectedItem="{Binding PurchaseVM.SelectedPart}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
+                            <Label Content="Dátum:" HorizontalAlignment="Left" Margin="579,0,0,62" VerticalAlignment="Bottom" />
+                            <Label Content="Alkatrész:" HorizontalAlignment="Left" Margin="217,0,0,62" VerticalAlignment="Bottom"/>
+                            <TextBox HorizontalAlignment="Left" Margin="282,0,0,33" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="50" Height="24" Text="{Binding PurchaseVM.EditPurchase.Quantity}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
+                            <Label Content="Mennyiség:" HorizontalAlignment="Left" Margin="207,0,0,33" VerticalAlignment="Bottom"/>
+                            <TextBox HorizontalAlignment="Left" Margin="402,0,0,33" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="120" Height="24" Text="{Binding PurchaseVM.EditPurchase.UnitPrice}" IsEnabled="{Binding PurchaseVM.IsEditMode}"/>
+                            <Label Content="Egységár:" HorizontalAlignment="Left" Margin="337,0,0,32" VerticalAlignment="Bottom"/>
+                            <TextBox HorizontalAlignment="Left" Margin="282,0,0,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="120" Height="24" Text="{Binding PurchaseVM.EditPurchase.Total, Mode=OneWay}" IsEnabled="False"/>
+                            <Label Content="Összesen:" HorizontalAlignment="Left" Margin="216,0,0,8" VerticalAlignment="Bottom"/>
+                            <Button Content="Mentés" HorizontalAlignment="Left" Margin="603,0,0,6" VerticalAlignment="Bottom" Command="{Binding PurchaseVM.SavePurchaseCmd}" Width="60"/>
+                            <Button Content="Mégse" HorizontalAlignment="Left" Margin="674,0,0,6" VerticalAlignment="Bottom" Command="{Binding PurchaseVM.CancelPurchaseCmd}" Width="60"/>
+                        </Grid>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Alkatrészek" Visibility="{Binding IsLoggedIn, Converter={StaticResource ShowTab}}">

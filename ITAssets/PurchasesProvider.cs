@@ -32,6 +32,8 @@ namespace ITAssets
     {
         public DatabaseService DBConnection;
         public bool _IsAddMode = false;
+        public PurchasesFilter Filter { get; set; } = new PurchasesFilter();
+        
         public ObservableCollection<Purchase> Purchases { get; }
         public ObservableCollection<Part> Parts { get; }
         public ObservableCollection<Category> Categories { get; }
@@ -42,6 +44,9 @@ namespace ITAssets
         
         public ICommand SavePurchaseCmd { get; }
         public ICommand CancelPurchaseCmd { get; }
+
+        public ICommand ApplyFilterCommand { get; }
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -129,6 +134,8 @@ namespace ITAssets
                     canExecute: _ => IsEditMode == true
 
                 );
+
+            ApplyFilterCommand = new RelayCommand(ApplyFilter);
         }
 
         private void ExecuteSave(object parameter)
@@ -173,6 +180,11 @@ namespace ITAssets
 
         }
         private bool CanExecuteSave(object parameter) => IsEditMode;
+
+        private void ApplyFilter(object parameter)
+        {
+
+        }
 
         private Purchase _selectedPurchase;
 
@@ -219,8 +231,6 @@ namespace ITAssets
                 }
             }
         }
-
-
 
         private Purchase _editPurchase;
         private Purchase _buffer1 = new Purchase();
