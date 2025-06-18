@@ -25,7 +25,7 @@ namespace ITAssets
 
     public class PartsViewModel:INotifyPropertyChanged
     {
-        public DatabaseService DBConnection;
+        private IPartRepository partRepository;
         public bool _IsAddMode = false;
         public ObservableCollection<Part> Parts{ get; }
         public ObservableCollection<Category> Categories{ get; }
@@ -39,11 +39,11 @@ namespace ITAssets
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public PartsViewModel()
+        public PartsViewModel(IPartRepository partRepository)
         {
-            DBConnection = new DatabaseService(App.connectionString);
-            Parts = new ObservableCollection<Part>(DBConnection.GetParts());
-            Categories = new ObservableCollection<Category>(DBConnection.GetCategories());
+            this.partRepository = partRepository;
+            Parts = new ObservableCollection<Part>(partRepository.GetParts());
+            Categories = new ObservableCollection<Category>(partRepository.GetCategories());
 
             AddPartCmd = new RelayCommand
                (
@@ -74,14 +74,14 @@ namespace ITAssets
                         if (delOk == MessageBoxResult.Yes)
                         {
 
-                            var result = DBConnection.DeletePart(SelectedPart);
+                            var result = partRepository.DeletePart(SelectedPart);
 
                             switch (result)
                             {
                                 case DeleteResult.Success:
                                     SelectedPart = null;
                                     Parts.Clear();
-                                    foreach (var part in DBConnection.GetParts())
+                                    foreach (var part in partRepository.GetParts())
                                     {
                                         Parts.Add(part);
                                     }
@@ -126,11 +126,11 @@ namespace ITAssets
 
             if (_IsAddMode)
             {
-                result = DBConnection.AddPart(EditPart);
+                result = partRepository.AddPart(EditPart);
             }
             else
             {
-                result = DBConnection.ModifyPart(EditPart);
+                result = partRepository.ModifyPart(EditPart);
             }
 
             switch (result)
@@ -138,7 +138,7 @@ namespace ITAssets
                 case UpdateResult.Success:
                     SelectedPart = null;
                     Parts.Clear();
-                    foreach (var part in DBConnection.GetParts())
+                    foreach (var part in partRepository.GetParts())
                     {
                         Parts.Add(part);
                     }

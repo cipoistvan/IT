@@ -44,7 +44,7 @@ namespace ITAssets
 
     public class UsersViewModel : INotifyPropertyChanged
     {
-        public DatabaseService DBConnection;
+        private IUserRepository UserRepository;
         public bool _IsAddMode = false;
         public ObservableCollection<User> Users { get; }
 
@@ -57,11 +57,11 @@ namespace ITAssets
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public UsersViewModel()
+        public UsersViewModel(IUserRepository UserRepository)
         {
 
-            DBConnection = new DatabaseService(App.connectionString);
-            Users = new ObservableCollection<User>(DBConnection.GetUsers());
+            this.UserRepository = UserRepository;
+            Users = new ObservableCollection<User>(UserRepository.GetUsers());
 
 
             AddUserCmd = new RelayCommand
@@ -91,14 +91,14 @@ namespace ITAssets
                         if (delOk == MessageBoxResult.Yes)
                         {
 
-                        var result = DBConnection.DeleteUser(SelectedUser);
+                        var result = UserRepository.DeleteUser(SelectedUser);
 
                             switch (result)
                             {
                                 case DeleteResult.Success:
                                     SelectedUser = null;
                                     Users.Clear();
-                                    foreach (var user in DBConnection.GetUsers())
+                                    foreach (var user in UserRepository.GetUsers())
                                     {
                                         Users.Add(user);
                                     }
@@ -180,11 +180,11 @@ namespace ITAssets
 
                     if (_IsAddMode)
                     {
-                        result = DBConnection.AddUser(EditUser);
+                        result = UserRepository.AddUser(EditUser);
                     }
                     else
                     {
-                        result = DBConnection.ModifyUser(EditUser);
+                        result = UserRepository.ModifyUser(EditUser);
                     }
 
 
@@ -194,7 +194,7 @@ namespace ITAssets
                         case UpdateResult.Success:
                             SelectedUser = null;
                             Users.Clear();
-                            foreach (var user in DBConnection.GetUsers())
+                            foreach (var user in UserRepository.GetUsers())
                             {
                                 Users.Add(user);
                             }

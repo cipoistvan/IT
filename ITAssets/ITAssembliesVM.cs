@@ -31,7 +31,8 @@ namespace ITAssets
 
     public class ITAssemblyViewModel:INotifyPropertyChanged
     {
-        public DatabaseService DBConnection;
+        private IITAssemblyRepository ITAssemblyRepository;
+        private IASPartRepository ASPartRepository;
         public bool _IsAddMode = false;
         public ObservableCollection<ITAssembly> ITAssemblies { get; }
 
@@ -46,12 +47,13 @@ namespace ITAssets
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         private MainViewModel mainviewmodel;
-        public ITAssemblyViewModel(MainViewModel mainViewModel)
+        public ITAssemblyViewModel(MainViewModel mainViewModel, IITAssemblyRepository ITAssemblyRepository, IASPartRepository ASPartRepository)
         {
             mainviewmodel = mainViewModel;
 
-            DBConnection = new DatabaseService(App.connectionString);
-            ITAssemblies = new ObservableCollection<ITAssembly>(DBConnection.GetITAssemblies());
+            this.ITAssemblyRepository = ITAssemblyRepository;
+            this.ASPartRepository = ASPartRepository;
+            ITAssemblies = new ObservableCollection<ITAssembly>(ITAssemblyRepository.GetITAssemblies());
 
             AddITAssemblyCmd = new RelayCommand
                (
@@ -81,14 +83,14 @@ namespace ITAssets
                         if (delOk == MessageBoxResult.Yes)
                         {
 
-                            var result = DBConnection.DeleteITAssembly(SelectedITAssembly);
+                            var result = ITAssemblyRepository.DeleteITAssembly(SelectedITAssembly);
 
                             switch (result)
                             {
                                 case DeleteResult.Success:
                                     SelectedITAssembly = null;
                                     ITAssemblies.Clear();
-                                    foreach (var ITAssembly in DBConnection.GetITAssemblies())
+                                    foreach (var ITAssembly in ITAssemblyRepository.GetITAssemblies())
                                     {
                                         ITAssemblies.Add(ITAssembly);
                                     }
@@ -136,11 +138,11 @@ namespace ITAssets
 
             if (_IsAddMode)
             {
-                result = DBConnection.AddITAssembly(EditITAssembly);
+                result = ITAssemblyRepository.AddITAssembly(EditITAssembly);
             }
             else
             {
-                result = DBConnection.ModifyITAssembly(EditITAssembly);
+                result = ITAssemblyRepository.ModifyITAssembly(EditITAssembly);
             }
             
             switch (result)
@@ -148,7 +150,7 @@ namespace ITAssets
                 case UpdateResult.Success:
                     SelectedITAssembly = null;
                     ITAssemblies.Clear();
-                    foreach (var ITAssembly in DBConnection.GetITAssemblies())
+                    foreach (var ITAssembly in ITAssemblyRepository.GetITAssemblies())
                     {
                         ITAssemblies.Add(ITAssembly);
                     }
@@ -195,7 +197,7 @@ namespace ITAssets
                     {
 
                         EditITAssembly = SelectedITAssembly;
-                        mainviewmodel.ASPartVM.ASParts = new ObservableCollection<ASPart>(DBConnection.GetASParts(SelectedITAssembly.ID));
+                        mainviewmodel.ASPartVM.ASParts = new ObservableCollection<ASPart>(ASPartRepository.GetASParts(SelectedITAssembly.ID));
                         
                     }
 

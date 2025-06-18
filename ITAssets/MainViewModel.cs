@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,14 +18,18 @@ namespace ITAssets
         public ASPartsViewModel ASPartVM { get; set; }
         public UsersViewModel UserVM { get; set; }
         public LoginViewModel LoginVM { get; set; }
+
+        private DatabaseService MySQlConnection;
         public MainViewModel()
         {
-            PurchaseVM = new PurchasesViewModel(this);
-            PartVM = new PartsViewModel();
-            ITAssemblyVM = new ITAssemblyViewModel(this);
-            ASPartVM = new ASPartsViewModel(this);
-            UserVM = new UsersViewModel();
-            LoginVM = new LoginViewModel(this);
+
+            MySQlConnection = new DatabaseService(App.connectionString);
+            PurchaseVM = new PurchasesViewModel(this, MySQlConnection, MySQlConnection);
+            PartVM = new PartsViewModel(MySQlConnection);
+            ITAssemblyVM = new ITAssemblyViewModel(this, MySQlConnection, MySQlConnection);
+            ASPartVM = new ASPartsViewModel(this, MySQlConnection);
+            UserVM = new UsersViewModel(MySQlConnection);
+            LoginVM = new LoginViewModel(this,MySQlConnection);
         }
 
 
@@ -34,7 +39,7 @@ namespace ITAssets
         {
             get
             {
-               // LoginVM.LoginUser = new User { ID = 1, UserName = "admin" };
+                //LoginVM.LoginUser = new User { ID = 1, UserName = "admin" };
                 
 
                 return _isLoggedIn;

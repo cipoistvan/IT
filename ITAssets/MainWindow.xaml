@@ -59,19 +59,20 @@
                             <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5,5,5,305">
                                 <DatePicker SelectedDate="{Binding PurchaseVM.Filter.FromDate}" />
                                 <TextBlock Text=" - " Margin="5,0"/>
-                                <DatePicker SelectedDate="{Binding PurchaseVM.Filter.toDate}" />
+                                <DatePicker SelectedDate="{Binding PurchaseVM.Filter.ToDate}" />
                                 <TextBlock Text="Terméknév:" Margin="5,0" VerticalAlignment="Center"/>
-                                <TextBox Width="100" Height="22" Margin="5,1,5,1"></TextBox>
+                                <TextBox Width="100" Height="22" Margin="5,1,5,1" Text="{Binding PurchaseVM.Filter.PartName}"/>
                                 <TextBlock Text="Típus" Margin="5,0" VerticalAlignment="Center"/>
-                                <TextBox Width="50" Height="22" Margin="5,1,5,1"></TextBox>
-                                <Button Content="Szűrés" Width="50" Command="{Binding ApplyFilterCommand}" />
+                                <TextBox Width="50" Height="22" Margin="5,1,5,1" Text="{Binding PurchaseVM.Filter.PartType}"/>
+                                <Button Content="Szűrés" Width="50" Margin="0,0,5,0" Command="{Binding PurchaseVM.ApplyFilterCmd}" />
+                                <Button Content="Törlés" Width="50" Command="{Binding PurchaseVM.ClearFilterCmd}" />
                             </StackPanel>
                         </Grid>
                         <Grid Background="#FFE5E5E5" Margin="0,36,0,0">
                             <DataGrid ItemsSource="{Binding PurchaseVM.Purchases}" AutoGenerateColumns="False" IsReadOnly="True" CanUserResizeRows="False" SelectedItem="{Binding PurchaseVM.SelectedPurchase}" IsEnabled="{Binding PurchaseVM.IsGridEnabled}" SelectionMode="Single" Margin="0,0,0,101">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="ID" Binding="{Binding ID}" SortDirection="Ascending"/>
-                                    <DataGridTextColumn Header="Dátum" Binding="{Binding Date}"/>
+                                    <DataGridTextColumn Header="Dátum" Binding="{Binding Date, StringFormat={}{0:yyyy.MM.dd}}"/>
                                     <DataGridTextColumn Header="Felhasználó" Binding="{Binding UserName}"/>
                                     <DataGridTextColumn Header="Terméknév" Binding="{Binding PartName}"/>
                                     <DataGridTextColumn Header="Típus" Binding="{Binding CategoryName}"/>

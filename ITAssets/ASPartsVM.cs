@@ -33,7 +33,7 @@ namespace ITAssets
 
     public class ASPartsViewModel:INotifyPropertyChanged
     {
-        public DatabaseService DBConnection;
+        private IASPartRepository ASPartRepository;
 
         private ObservableCollection<ASPart> _asparts;
         public ObservableCollection<ASPart> ASParts 
@@ -56,8 +56,10 @@ namespace ITAssets
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         private MainViewModel mainviewmodel;
-        public ASPartsViewModel(MainViewModel mainViewModel)
+        public ASPartsViewModel(MainViewModel mainViewModel, IASPartRepository ASPartRepository)
         {
+
+            this.ASPartRepository = ASPartRepository;
 
             AddASPartCmd = new RelayCommand
             (
@@ -73,14 +75,14 @@ namespace ITAssets
                         addpart.AssemblyID = mainviewmodel.ITAssemblyVM.SelectedITAssembly.ID;
                         addpart.PartID = mainviewmodel.PartVM.SelectedPart.ID;
                         addpart.Quantity = 1;
-                        var result = DBConnection.AddASPart(addpart);
+                        var result = ASPartRepository.AddASPart(addpart);
 
                         switch (result)
                         {
                             case UpdateResult.Success:
                                 
                                 ASParts.Clear();
-                                foreach (var aspart in DBConnection.GetASParts(mainviewmodel.ITAssemblyVM.SelectedITAssembly.ID))
+                                foreach (var aspart in ASPartRepository.GetASParts(mainviewmodel.ITAssemblyVM.SelectedITAssembly.ID))
                                 {
                                     ASParts.Add(aspart);
                                 }
@@ -118,14 +120,14 @@ namespace ITAssets
                     if (delOk == MessageBoxResult.Yes)
                     {
 
-                        var result = DBConnection.DeleteASPart(SelectedASPart);
+                        var result = ASPartRepository.DeleteASPart(SelectedASPart);
 
                         switch (result)
                         {
                             case DeleteResult.Success:
                                 SelectedASPart = null;
                                 ASParts.Clear();
-                                foreach (var aspart in DBConnection.GetASParts(mainviewmodel.ITAssemblyVM.SelectedITAssembly.ID))
+                                foreach (var aspart in ASPartRepository.GetASParts(mainviewmodel.ITAssemblyVM.SelectedITAssembly.ID))
                                 {
                                     ASParts.Add(aspart);
                                 }
@@ -148,8 +150,8 @@ namespace ITAssets
             );
 
             mainviewmodel = mainViewModel;
-            DBConnection = new DatabaseService(App.connectionString);
-            ASParts = new ObservableCollection<ASPart>(DBConnection.GetASParts(null));
+            
+            ASParts = new ObservableCollection<ASPart>(ASPartRepository.GetASParts(null));
         }
 
         private ASPart _selectedASPart;

@@ -30,11 +30,14 @@ namespace ITAssets
 
     public class PurchasesViewModel:INotifyPropertyChanged
     {
-        public DatabaseService DBConnection;
+        private readonly IPurchaseRepository purchaseRepository;
+        private readonly IPartRepository partRepository;
+        
         public bool _IsAddMode = false;
         public PurchasesFilter Filter { get; set; } = new PurchasesFilter();
         
-        public ObservableCollection<Purchase> Purchases { get; }
+        public ObservableCollection<Purchase> Purchases { get; set; }
+        public List<Purchase> AllPurchases { get; set; }
         public ObservableCollection<Part> Parts { get; }
         public ObservableCollection<Category> Categories { get; }
 
@@ -45,22 +48,24 @@ namespace ITAssets
         public ICommand SavePurchaseCmd { get; }
         public ICommand CancelPurchaseCmd { get; }
 
-        public ICommand ApplyFilterCommand { get; }
+        public ICommand ApplyFilterCmd { get; }
+        public ICommand ClearFilterCmd { get; }
 
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         private MainViewModel mainviewmodel;
-        public PurchasesViewModel(MainViewModel mainViewModel)
+        public PurchasesViewModel(MainViewModel mainViewModel, IPurchaseRepository purchaseRepository, IPartRepository partRepository)
         {
-
             mainviewmodel = mainViewModel;
+            this.purchaseRepository = purchaseRepository;
+            this.partRepository = partRepository;
 
-            DBConnection = new DatabaseService(App.connectionString);
-            Purchases = new ObservableCollection<Purchase>(DBConnection.GetPurchases());
-            Parts = new ObservableCollection<Part>(DBConnection.GetParts());
-            Categories = new ObservableCollection<Category>(DBConnection.GetCategories());
+            Purchases = new ObservableCollection<Purchase>(purchaseRepository.GetPurchases());
+            AllPurchases = Purchases.ToList();
+            Parts = new ObservableCollection<Part>(partRepository.GetParts());
+            Categories = new ObservableCollection<Category>(partRepository.GetCategories());
 
             AddPurchaseCmd = new RelayCommand
                (
@@ -91,14 +96,16 @@ namespace ITAssets
                        if (delOk == MessageBoxResult.Yes)
                        {
 
-                           var result = DBConnection.DeletePurchase(SelectedPurchase);
+                           var result = purchaseRepository.DeletePurchase(SelectedPurchase);
 
                            switch (result)
                            {
                                case DeleteResult.Success:
                                    SelectedPurchase = null;
                                    Purchases.Clear();
-                                   foreach (var purchase in DBConnection.GetPurchases())
+                                   AllPurchases = purchaseRepository.GetPurchases();
+
+                                   foreach (var purchase in AllPurchases)
                                    {
                                        Purchases.Add(purchase);
                                    }
@@ -135,7 +142,23 @@ namespace ITAssets
 
                 );
 
-            ApplyFilterCommand = new RelayCommand(ApplyFilter);
+            ApplyFilterCmd = new RelayCommand(ApplyFilter);
+
+            ClearFilterCmd = new RelayCommand(
+                execute: _=>
+                {
+                    Filter.FromDate = null;
+                    Filter.ToDate = null;
+                    Filter.PartName = string.Empty;
+                    Filter.PartType = string.Empty;
+
+                    AllPurchases = purchaseRepository.GetPurchases();
+
+                    Purchases = new ObservableCollection<Purchase>(AllPurchases.ToList());
+                    
+                    OnPropertyChanged(nameof(Purchases));
+
+                });
         }
 
         private void ExecuteSave(object parameter)
@@ -146,11 +169,11 @@ namespace ITAssets
             EditPurchase.UserId = mainviewmodel.LoginVM.LoginUser.ID;
             if (_IsAddMode)
             {
-                result = DBConnection.AddPurchase(EditPurchase);
+                result = purchaseRepository.AddPurchase(EditPurchase);
             }
             else
             {
-                result = DBConnection.ModifyPurchase(EditPurchase);
+                result = purchaseRepository.ModifyPurchase(EditPurchase);
             }
 
             switch (result)
@@ -158,7 +181,8 @@ namespace ITAssets
                 case UpdateResult.Success:
                     SelectedPurchase = null;
                     Purchases.Clear();
-                    foreach (var purchase in DBConnection.GetPurchases())
+                    AllPurchases = purchaseRepository.GetPurchases();
+                    foreach (var purchase in AllPurchases)
                     {
                         Purchases.Add(purchase);
                     }
@@ -183,6 +207,22 @@ namespace ITAssets
 
         private void ApplyFilter(object parameter)
         {
+            var strategies = new List<IFilterStrategy<Purchase>>();
+
+            if (!string.IsNullOrWhiteSpace(Filter.PartName))
+                strategies.Add(new PartNameFilter(Filter.PartName));
+
+            if (!string.IsNullOrWhiteSpace(Filter.PartType))
+                strategies.Add(new PartTypeFilter(Filter.PartType));
+
+            if (Filter.FromDate.HasValue || Filter.ToDate.HasValue)
+                strategies.Add(new DateRangeFilter(Filter.FromDate, Filter.ToDate));
+
+            var combined = new AndFilter<Purchase>(strategies);
+            var result = AllPurchases.Where(p => combined.Matches(p)).ToList();
+
+            Purchases = new ObservableCollection<Purchase>(result);
+            OnPropertyChanged(nameof(Purchases));
 
         }
 

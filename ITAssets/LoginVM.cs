@@ -29,16 +29,7 @@ namespace ITAssets
 
     public class LoginViewModel:INotifyPropertyChanged
     {
-        public DatabaseService DBConnection;
-        private User _loginUser;
-        public User LoginUser {
-            get { return _loginUser; }
-            set { 
-                _loginUser = value;
-                OnPropertyChanged(nameof(LoginUser));
-            }
-        
-        }
+        private readonly IUserRepository userRepository;
         public ICommand LoginStart { get; }
         public ICommand Login { get; }
         public ICommand LoginCancel { get; }
@@ -50,10 +41,10 @@ namespace ITAssets
 
         
 
-        public LoginViewModel(MainViewModel mainViewModel)
+        public LoginViewModel(MainViewModel mainViewModel, IUserRepository userRepository)
         {
             mainviewmodel = mainViewModel;
-            DBConnection = new DatabaseService(App.connectionString);
+            this.userRepository = userRepository;
 
             LoginUser = new User { Email = "", Password = "" };
 
@@ -84,7 +75,7 @@ namespace ITAssets
         private void ExecuteLogin(object parameter)
         {
             LoginUser.Password = ((PasswordBox)parameter).Password;
-            var FoundUser = DBConnection.GetUser(LoginUser);
+            var FoundUser = userRepository.GetUser(LoginUser);
 
             bool ValidCredentials = true;
 
@@ -132,6 +123,19 @@ namespace ITAssets
                     OnPropertyChanged(nameof(IsLoginMode));
                 }
             }
+        }
+
+
+        private User _loginUser;
+        public User LoginUser
+        {
+            get { return _loginUser; }
+            set
+            {
+                _loginUser = value;
+                OnPropertyChanged(nameof(LoginUser));
+            }
+
         }
 
 

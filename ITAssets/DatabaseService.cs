@@ -6,7 +6,50 @@ using System.Windows;
 
 namespace ITAssets
 {
-    public class DatabaseService
+
+    public interface IPurchaseRepository
+    {
+        List<Purchase> GetPurchases();
+        UpdateResult AddPurchase(Purchase purchase);
+        UpdateResult ModifyPurchase(Purchase purchase);
+        DeleteResult DeletePurchase(Purchase purchase);
+        List<Category> GetCategories();
+    }
+
+    public interface IASPartRepository
+    {
+        List<ASPart> GetASParts(int? assemblyid);
+        UpdateResult AddASPart(ASPart aspart);
+        DeleteResult DeleteASPart(ASPart aspart);
+    }
+
+    public interface IPartRepository
+    {
+        List<Part> GetParts();
+        UpdateResult AddPart(Part part);
+        UpdateResult ModifyPart(Part part);
+        DeleteResult DeletePart(Part part);
+        List<Category> GetCategories();
+    }
+
+    public interface IITAssemblyRepository
+    {
+        List<ITAssembly> GetITAssemblies();
+        UpdateResult AddITAssembly(ITAssembly itassembly);
+        UpdateResult ModifyITAssembly(ITAssembly itassembly);
+        DeleteResult DeleteITAssembly(ITAssembly itassembly);
+    }
+
+    public interface IUserRepository
+    {
+        User GetUser(User user);
+        List<User> GetUsers();
+        UpdateResult AddUser(User user);
+        UpdateResult ModifyUser(User user);
+        DeleteResult DeleteUser(User user);
+    }
+    
+    public class DatabaseService : IPurchaseRepository, IASPartRepository, IPartRepository, IITAssemblyRepository, IUserRepository
     {
         private readonly string connectionString;
         public DatabaseService(string connectionString)
@@ -30,7 +73,7 @@ namespace ITAssets
                 throw;
 
             }
-            
+
 
         }
         public MySqlDataReader ExecuteQuery(MySqlConnection conn, string query)
@@ -38,8 +81,8 @@ namespace ITAssets
             var cmd = new MySqlCommand(query, conn);
             return cmd.ExecuteReader(CommandBehavior.CloseConnection);
         }
-        
-        
+
+
         public List<Purchase> GetPurchases()
         {
             var list = new List<Purchase>();
@@ -169,7 +212,7 @@ namespace ITAssets
                     cmd.Parameters.AddWithValue("@quantity", purchase.Quantity);
                     cmd.Parameters.AddWithValue("@unitprice", purchase.UnitPrice);
                     cmd.Parameters.AddWithValue("@date", purchase.Date);
-                    
+
 
                     cmd.ExecuteNonQuery();
                     return UpdateResult.Success;
@@ -244,7 +287,7 @@ namespace ITAssets
                 {
                     ID = reader.GetInt32("ID"),
                     Name = reader.GetString("Name"),
-                    
+
                 });
             }
 
@@ -540,7 +583,7 @@ namespace ITAssets
 
                     using var conn = GetConnection();
                     using var cmd = new MySqlCommand(query, conn);
-                    
+
                     cmd.Parameters.AddWithValue("@assemblyid", aspart.AssemblyID);
                     cmd.Parameters.AddWithValue("@partid", aspart.PartID);
                     cmd.Parameters.AddWithValue("@quantity", aspart.Quantity);
@@ -616,7 +659,7 @@ namespace ITAssets
                     ID = reader.GetInt32("ID"),
                     UserName = reader.GetString("UserName"),
                     Password = reader.GetString("Password"),
-                    Email= reader.GetString("Email")
+                    Email = reader.GetString("Email")
 
                 });
             }
@@ -659,7 +702,7 @@ namespace ITAssets
         }
         public DeleteResult DeleteUser(User user)
         {
-            if (user is not null && user.ID > 0 )
+            if (user is not null && user.ID > 0)
             {
 
                 try
