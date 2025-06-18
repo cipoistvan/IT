@@ -74,6 +74,13 @@ namespace ITAssets
 
         private void ExecuteLogin(object parameter)
         {
+
+            if (!ITValidators.ValidEmail(LoginUser.Email))
+            {
+                MessageBox.Show("Hibás email formátum!");
+                return;
+            }
+
             LoginUser.Password = ((PasswordBox)parameter).Password;
             var FoundUser = userRepository.GetUser(LoginUser);
 

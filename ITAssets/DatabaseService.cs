@@ -16,6 +16,49 @@ namespace ITAssets
         List<Category> GetCategories();
     }
 
+    public class LoggingPurchaseRepository : IPurchaseRepository
+    {
+        private readonly IPurchaseRepository _inner;
+        private readonly ILogger _logger;
+
+        public LoggingPurchaseRepository(IPurchaseRepository inner, ILogger logger)
+        {
+            _inner = inner;
+            _logger = logger;
+        }
+
+        public List<Purchase> GetPurchases()
+        {
+            _logger.LogInformation("Számlaadatok lekérdezve");
+            return _inner.GetPurchases();
+        }
+
+        public UpdateResult AddPurchase(Purchase purchase)
+        {
+            _logger.LogInformation($"Új számla rögzítve: {purchase.PartName}, {purchase.Quantity} db.");
+            return _inner.AddPurchase(purchase);
+        }
+
+        public UpdateResult ModifyPurchase(Purchase purchase)
+        {
+            _logger.LogWarning($"Számla adatai módositva: {purchase.PartName}, {purchase.Quantity} db.");
+            return _inner.ModifyPurchase(purchase);
+        }
+        public DeleteResult DeletePurchase(Purchase purchase)
+        {
+            _logger.LogWarning($"Számla törölve: {purchase.PartName}, {purchase.Quantity} db.");
+            return _inner.DeletePurchase(purchase);
+        }
+        public List<Category> GetCategories()
+
+        {
+            return _inner.GetCategories();
+        }
+
+    }
+
+
+
     public interface IASPartRepository
     {
         List<ASPart> GetASParts(int? assemblyid);

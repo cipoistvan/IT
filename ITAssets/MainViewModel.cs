@@ -20,11 +20,13 @@ namespace ITAssets
         public LoginViewModel LoginVM { get; set; }
 
         private DatabaseService MySQlConnection;
+        private IPurchaseRepository MySQLPurchaseLogging;
         public MainViewModel()
         {
 
             MySQlConnection = new DatabaseService(App.connectionString);
-            PurchaseVM = new PurchasesViewModel(this, MySQlConnection, MySQlConnection);
+            MySQLPurchaseLogging = new LoggingPurchaseRepository(MySQlConnection, App.logger);
+            PurchaseVM = new PurchasesViewModel(this, MySQLPurchaseLogging, MySQlConnection);
             PartVM = new PartsViewModel(MySQlConnection);
             ITAssemblyVM = new ITAssemblyViewModel(this, MySQlConnection, MySQlConnection);
             ASPartVM = new ASPartsViewModel(this, MySQlConnection);

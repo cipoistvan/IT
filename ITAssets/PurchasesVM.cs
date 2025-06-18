@@ -165,7 +165,6 @@ namespace ITAssets
         {
             UpdateResult result;
 
-
             EditPurchase.UserId = mainviewmodel.LoginVM.LoginUser.ID;
             if (_IsAddMode)
             {

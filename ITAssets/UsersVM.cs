@@ -154,6 +154,13 @@ namespace ITAssets
                 bool EmptyPasswords = string.IsNullOrEmpty(val1) && string.IsNullOrEmpty(val2);
                 bool EqualPasswords = val1 == val2;
 
+                if (!ITValidators.ValidEmail(EditUser.Email))
+                {
+                    MessageBox.Show("Hibás email formátum!");
+                    return;
+                }
+
+
                 if (EmptyStoredPassword && EmptyPasswords)
                 {
                     MessageBox.Show("Nincs jelszó megadva");
