@@ -21,6 +21,23 @@ namespace ITAssets
         }
 
 
+        public static bool ValidatePurchaseYear(DateTime? date)
+        {
+            int currentYear = DateTime.Now.Year;
+            var year = date?.Year;
+            return year >= 2000 && year <= currentYear;
+        }
+
+        public static bool ValidateQty(int qty)
+        {
+            if (qty < 1 || qty > 100)
+                return false;
+            return true;
+        }
+
+
+
+
 
     }
 }

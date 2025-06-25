@@ -163,6 +163,19 @@ namespace ITAssets
 
         private void ExecuteSave(object parameter)
         {
+
+            if(!ITValidators.ValidatePurchaseYear(EditPurchase.Date))
+            {
+                MessageBox.Show("Túl régi vagy jövőbeni dátum !");
+                return;
+            }
+
+            if (!ITValidators.ValidateQty(EditPurchase.Quantity))
+            {
+                MessageBox.Show("A darabszámnak 1 - 100 között kell lennie !");
+                return;
+            }
+
             UpdateResult result;
 
             EditPurchase.UserId = mainviewmodel.LoginVM.LoginUser.ID;

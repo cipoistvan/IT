@@ -1,6 +1,8 @@
 ﻿
 
 using ITAssets;
+using System.Globalization;
+using System.Net.Quic;
 
 namespace ITTest
 {
@@ -8,35 +10,57 @@ namespace ITTest
     public sealed class ITValidatorsTest
     {
         [TestMethod]
-        public void ValidEmailCheck()
+        [DataRow("aaa",false)]
+        [DataRow("a@b.hu", true)]
+        [DataRow("a@ b.hu", false)]
+        [DataRow("a@b.co.hu", true)]
+
+        public void ValidEmailCheck(string email, bool expected)
         {
-            string emailbad = "aaa";
-            bool expected = false;
-            bool actual = ITValidators.ValidEmail(emailbad);
+
+            bool actual = ITValidators.ValidEmail(email);
 
             Assert.AreEqual(expected, actual);
 
         }
+
+
         [TestMethod]
-        public void ValidEmailCheck2()
+        [DataRow("2025.03.26", true)]
+        [DataRow("1990.02.04", false)]
+        [DataRow("2026.01.01", false)]
+        [DataRow("2000.01.01", true)]
+
+        public void PurchaseYearTest(string date, bool expected)
         {
-            string emailbad = "a@b.hu";
-            bool expected = true;
-            bool actual = ITValidators.ValidEmail(emailbad);
+            DateTime? realdate = DateTime.Parse(date,new CultureInfo("hu-HU"));
+
+            bool actual = ITValidators.ValidatePurchaseYear(realdate);
 
             Assert.AreEqual(expected, actual);
 
         }
+
+
         [TestMethod]
-        public void ValidEmailCheck3()
+        [DataRow(5, true)]
+        [DataRow(1, true)]
+        [DataRow(100, true)]
+        [DataRow(-1, false)]
+        [DataRow(0, false)]
+        [DataRow(101, false)]
+
+        public void QtyTest(int qty, bool expected)
         {
-            string emailbad = "a@ b.hu";
-            bool expected = false;
-            bool actual = ITValidators.ValidEmail(emailbad);
-
-            Assert.AreEqual(expected, actual);
-
+            Assert.AreEqual(expected, ITValidators.ValidateQty(qty));
         }
+
+
+
+
+
+
+
 
 
 
